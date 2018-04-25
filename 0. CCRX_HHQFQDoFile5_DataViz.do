@@ -563,70 +563,70 @@ use `temp', replace
 
 *All women | Married women
 foreach group in all mar {
-*Each Grouping
-foreach var in total age5 married umsexactive parity3 ur school wealth region {
+	*Each Grouping
+	foreach var in total age5 married umsexactive parity3 ur school wealth region {
 
-preserve
-keep if `group'==1
+		preserve
+		keep if `group'==1
 
-collapse (mean) cp_`group'=cp mcp_`group'=mcp tcp_`group'=tcp ///
-unmettot_`group'=unmettot unmetspace_`group'=unmetspace unmetlimit_`group'=unmetlimit ///
-totaldemand_`group'=totaldemand demandsatis_`group'=demandsatis ///
-visited_by_health_worker_`group'=visited_by_health_worker visited_facility_fp_disc_`group'=visited_facility_fp_disc fp_discussion_`group'=fp_discussion ///
-[aw=FQweight], by(`var')
+		collapse (mean) cp_`group'=cp mcp_`group'=mcp tcp_`group'=tcp ///
+		unmettot_`group'=unmettot unmetspace_`group'=unmetspace unmetlimit_`group'=unmetlimit ///
+		totaldemand_`group'=totaldemand demandsatis_`group'=demandsatis ///
+		visited_by_health_worker_`group'=visited_by_health_worker visited_facility_fp_disc_`group'=visited_facility_fp_disc fp_discussion_`group'=fp_discussion ///
+		[aw=FQweight], by(`var')
 
-*CP, unmet need, birth by 18 (all women 18-24)
-replace cp_`group'=cp_`group'*100
-replace mcp_`group'=mcp_`group'*100
-replace tcp_`group'=tcp_`group'*100
-replace unmettot_`group'=unmettot_`group'*100
-replace unmetspace_`group'=unmetspace_`group'*100
-replace unmetlimit_`group'=unmetlimit_`group'*100
-replace totaldemand_`group'=totaldemand_`group'*100
-replace demandsatis_`group'=demandsatis_`group'*100  
-replace visited_by_health_worker_`group'=visited_by_health_worker_`group'*100
-replace visited_facility_fp_disc_`group'=visited_facility_fp_disc_`group'*100
-replace fp_discussion_`group'=fp_discussion_`group'*100
+		*CP, unmet need, birth by 18 (all women 18-24)
+		replace cp_`group'=cp_`group'*100
+		replace mcp_`group'=mcp_`group'*100
+		replace tcp_`group'=tcp_`group'*100
+		replace unmettot_`group'=unmettot_`group'*100
+		replace unmetspace_`group'=unmetspace_`group'*100
+		replace unmetlimit_`group'=unmetlimit_`group'*100
+		replace totaldemand_`group'=totaldemand_`group'*100
+		replace demandsatis_`group'=demandsatis_`group'*100  
+		replace visited_by_health_worker_`group'=visited_by_health_worker_`group'*100
+		replace visited_facility_fp_disc_`group'=visited_facility_fp_disc_`group'*100
+		replace fp_discussion_`group'=fp_discussion_`group'*100
 
-*Drop irrelavent/ unused categories
-capture drop if married==0
-capture drop if umsexactive==0
-capture drop if married==1 & cp_mar!=.
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
 
-tempfile temp2
-save `temp2', replace
+		tempfile temp2
+		save `temp2', replace
 
-use "`CCRX'_DataViz.dta"
-append using `temp2'
-save "`CCRX'_DataViz.dta", replace
-restore
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
+		save "`CCRX'_DataViz.dta", replace
+		restore
+		
+		*Generate denominators
+		foreach indicator in cp mcp tcp unmettot unmetspace unmetlimit totaldemand demandsatis visited_by_health_worker visited_facility_fp_disc fp_discussion {
+		
+			preserve
+			keep if `group'==1
 
-*Generate denominators
-foreach indicator in cp mcp tcp unmettot unmetspace unmetlimit totaldemand demandsatis visited_by_health_worker visited_facility_fp_disc fp_discussion {
+			bysort `var': egen d_`indicator'_`group'=count(_n) if `indicator'==1 | `indicator'==0
 
-preserve
-keep if `group'==1
+			collapse (mean) d_`indicator'_`group', by(`var')
 
-bysort `var': egen d_`indicator'_`group'=count(_n) if `indicator'==1
+			*Drop irrelavent/ unused categories
+			capture drop if married==0
+			capture drop if umsexactive==0
+			capture drop if married==1 & cp_mar!=.
 
-collapse (mean) d_`indicator'_`group' [pw=FQweight], by(`var')
+			tempfile temp2
+			save `temp2', replace
 
-*Drop irrelavent/ unused categories
-capture drop if married==0
-capture drop if umsexactive==0
-capture drop if married==1 & cp_mar!=.
-
-tempfile temp2
-save `temp2', replace
-
-use "`CCRX'_DataViz.dta"
-append using `temp2'
-capture order d_`indicator'_`group', after(`indicator'_`group')
-save "`CCRX'_DataViz.dta", replace
-restore
-}
-}
-}
+			use "`CCRX'_DataViz.dta"
+			append using `temp2'
+			capture order d_`indicator'_`group', after(`indicator'_`group')
+			save "`CCRX'_DataViz.dta", replace
+			restore
+			}
+		}
+	}
 *
 
 ******************************************************************************************************************
@@ -638,75 +638,94 @@ use `temp', replace
 
 *All women | Married women
 foreach group in all mar {
-*Each grouping
-foreach var in total age5 married umsexactive parity3 ur school wealth region {
+	*Each grouping
+	foreach var in total age5 married umsexactive parity3 ur school wealth region {
 
-preserve
-keep if `group'==1
-*Updated 4/24/18: add EC and sayana press to method mix (change current_method_recode2 to current_method_recode)
-*				  changed injectables_group to dmpa_group and dmpasc_group; added ec_group
-keep if current_method_recode!=.
+		preserve
+		keep if `group'==1
+		*Updated 4/24/18: add EC and sayana press to method mix (change current_method_recode2 to current_method_recode)
+		*				  changed injectables_group to dmpa_group and dmpasc_group; added ec_group
+		keep if current_method_recode!=.
 
-collapse (mean) ster_`group'=m1 ///
-             implant_`group'=m2 ///
-                 IUD_`group'=m3 ///
-                dmpa_`group'=m4 ///
-		      dmpasc_`group'=m5 ///
-                pill_`group'=m6 ///
-		          ec_`group'=m7 ///
-              condom_`group'=m8 ///
-        other_modern_`group'=m9 /// 
-[aw=FQweight], by(`var')
+		collapse (mean) ster_`group'=m1 ///
+					implant_`group'=m2 ///
+						IUD_`group'=m3 ///
+						dmpa_`group'=m4 ///
+					dmpasc_`group'=m5 ///
+						pill_`group'=m6 ///
+						ec_`group'=m7 ///
+					condom_`group'=m8 ///
+				other_modern_`group'=m9 /// 
+				traditional_`group'=m10 ///
+				[aw=FQweight], by(`var')
 
-*Methods
-replace ster_`group'=ster_`group'*100 
-replace implant_`group'=implant_`group'*100 
-replace IUD_`group'=IUD_`group'*100 
-replace dmpa_`group'=injectables_`group'*100
-replace dmpasc_`group'=injectables_`group'*100  
-replace pill_`group'=pill_`group'*100
-replace ec_`group'=pill_`group'*100 
-replace condom_`group'=condom_`group'*100 
-replace other_modern_`group'=other_modern_`group'*100 
-replace traditional_`group'=traditional_`group'*100  
+		*Methods
+		replace ster_`group'=ster_`group'*100 
+		replace implant_`group'=implant_`group'*100 
+		replace IUD_`group'=IUD_`group'*100 
+		replace dmpa_`group'=dmpa_`group'*100
+		replace dmpasc_`group'=dmpasc_`group'*100  
+		replace pill_`group'=pill_`group'*100
+		replace ec_`group'=pill_`group'*100 
+		replace condom_`group'=condom_`group'*100 
+		replace other_modern_`group'=other_modern_`group'*100 
+		replace traditional_`group'=traditional_`group'*100  
 
-*Drop irrelavent/ unused categories
-capture drop if married==0
-capture drop if umsexactive==0
-capture drop if married==1 & cp_mar!=.
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
 
-tempfile temp2
-save `temp2', replace
+		tempfile temp2
+		save `temp2', replace
 
-use "`CCRX'_DataViz.dta"
-append using `temp2'
-save "`CCRX'_DataViz.dta", replace
-restore
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
+		save "`CCRX'_DataViz.dta", replace
+		restore
 
-*Generate Denominators
-foreach method in m1 m2 m3 m4 m5 m6 m7 m8 m9 {
+		*Generate Denominators
+		foreach method in m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 {
 
-preserve
-keep if `group'==1
-keep if current_method_recode!=.
+			preserve
+			keep if `group'==1
+			keep if current_method_recode!=.
+		
+			bysort `var': egen d_`method'_`group'=count(_n) if `method'==1 | `method'==0
+			
+			collapse (mean) d_`method'_`group', by(`var')
 
-bysort `var': egen d_`method'_`group'=count(_n) if `method'==1
+			*Drop irrelavent/ unused categories
+			capture drop if married==0
+			capture drop if umsexactive==0
+			capture drop if married==1 & cp_mar!=.
 
-collapse (mean) d_`method'_`group' [pw=FQweight], by(`var')
+			tempfile temp2	
+			save `temp2', replace
 
-capture rename d_m1_`group' d_ster_`group'
-capture rename d_m2_`group' d_implant_`group'
-capture rename d_m3_`group' d_IUD_`group'
-capture rename d_m4_`group' d_dmpa_`group'
-capture rename d_m5_`group' d_dmpasc_`group'
-capture rename d_m6_`group' d_pill_`group'
-capture rename d_m7_`group' d_ec_`group'
-capture rename d_m8_`group' d_condom_`group'
-capture rename d_m9_`group' d_other_modern_`group'
+			use "`CCRX'_DataViz.dta"
+			append using `temp2'
+			capture order d_`method'_`group', after(`method'_`group')
+			save "`CCRX'_DataViz.dta", replace
+			restore
+			}
+		}
+	preserve
+	use "`CCRX'_DataViz.dta"
+	rename d_m1_`group' d_ster_`group'
+	rename d_m2_`group' d_implant_`group'
+	rename d_m3_`group' d_IUD_`group'
+	rename d_m4_`group' d_dmpa_`group'
+	rename d_m5_`group' d_dmpasc_`group'
+	rename d_m6_`group' d_pill_`group'
+	rename d_m7_`group' d_ec_`group'
+	rename d_m8_`group' d_condom_`group'
+	rename d_m9_`group' d_other_modern_`group'
+	rename d_m10_`group' d_traditional_`group'
+	save "`CCRX'_DataViz.dta", replace
+	restore
+	}
 
-}
-}
-}
 * 
 
 ******************************************************************************************************************
