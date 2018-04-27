@@ -737,62 +737,101 @@ use `temp', replace
 	
 *All women | Married women
 foreach group in all mar {
-*Each grouping
-foreach var in total age5 married umsexactive parity3 ur school wealth region {
+	*Each grouping
+	foreach var in total age5 married umsexactive parity3 ur school wealth region {
 
-preserve
-keep if `group'==1
-keep if mcp==1
+		preserve
+		keep if `group'==1
+		keep if mcp==1
 
-collapse (mean) ///
- methodchoice_self_`group'=methodchoice_self /// 
-methodchoice_joint_`group'=methodchoice_joint /// 
-methodchoice_other_`group'=methodchoice_other ///   
-	 fees_12months_`group'=fees_12months ///
-	   fp_told_other_methods_`group'=fp_told_other_methods ///
-             fp_side_effects_`group'=fp_side_effects ///
-fp_side_effects_instructions_`group'=fp_side_effects_instructions ///
-return_to_provider_`group'=return_to_provider ///
- refer_to_relative_`group'=refer_to_relative ///
-   returnrefer_dir_`group'=returnrefer_dir ///
-[aw=FQweight], by(`var')
+		collapse (mean) ///
+			methodchoice_self_`group'=methodchoice_self /// 
+			methodchoice_joint_`group'=methodchoice_joint /// 
+			methodchoice_other_`group'=methodchoice_other ///   
+			fees_12months_`group'=fees_12months ///
+			fp_told_other_methods_`group'=fp_told_other_methods ///
+			fp_side_effects_`group'=fp_side_effects ///
+			fp_side_effects_instructions_`group'=fp_side_effects_instructions ///
+			return_to_provider_`group'=return_to_provider ///
+			refer_to_relative_`group'=refer_to_relative ///
+			returnrefer_dir_`group'=returnrefer_dir ///
+			[aw=FQweight], by(`var')
  
-*Methods choice
-replace methodchoice_self_`group'=methodchoice_self_`group'*100
-replace methodchoice_joint_`group'=methodchoice_joint_`group'*100
-replace methodchoice_other_`group'=methodchoice_other_`group'*100
-*Paid fees
-replace fees_12months_`group'=fees_12months_`group'*100 
-*Method info
-replace fp_told_other_methods_`group'=fp_told_other_methods_`group'*100
-replace fp_side_effects_`group'=fp_side_effects_`group'*100
-replace fp_side_effects_instructions_`group'=fp_side_effects_instructions_`group'*100
-*Would return and/or refer
-replace return_to_provider_`group'=return_to_provider_`group'*100
-replace refer_to_relative_`group'=refer_to_relative_`group'*100
-replace returnrefer_dir_`group'=returnrefer_dir_`group'*100
+		*Methods choice
+		replace methodchoice_self_`group'=methodchoice_self_`group'*100
+		replace methodchoice_joint_`group'=methodchoice_joint_`group'*100
+		replace methodchoice_other_`group'=methodchoice_other_`group'*100
+		*Paid fees
+		replace fees_12months_`group'=fees_12months_`group'*100 
+		*Method info
+		replace fp_told_other_methods_`group'=fp_told_other_methods_`group'*100
+		replace fp_side_effects_`group'=fp_side_effects_`group'*100
+		replace fp_side_effects_instructions_`group'=fp_side_effects_instructions_`group'*100
+		*Would return and/or refer
+		replace return_to_provider_`group'=return_to_provider_`group'*100
+		replace refer_to_relative_`group'=refer_to_relative_`group'*100
+		replace returnrefer_dir_`group'=returnrefer_dir_`group'*100
 
-*Drop irrelavent/ unused categories
-capture drop if married==0
-capture drop if umsexactive==0
-capture drop if married==1 & cp_mar!=.
-*Drop unused variables
-capture drop methodchoice_self_mar
-capture drop methodchoice_joint_mar
-capture drop methodchoice_other_mar
-capture drop return_to_provider_mar
-capture drop refer_to_relative_mar
-capture drop returnrefer_dir_mar
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
+		*Drop unused variables
+		capture drop methodchoice_self_mar
+		capture drop methodchoice_joint_mar
+		capture drop methodchoice_other_mar
+		capture drop return_to_provider_mar
+		capture drop refer_to_relative_mar
+		capture drop returnrefer_dir_mar
 
-tempfile temp2
-save `temp2', replace
+		tempfile temp2
+		save `temp2', replace
 
-use "`CCRX'_DataViz.dta"
-append using `temp2'
-save "`CCRX'_DataViz.dta", replace
-restore
-}
-}
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
+		save "`CCRX'_DataViz.dta", replace
+		restore
+		
+		*Generate Denominators
+		rename fp_side_effects_instructions fp_sideeffects_instruct
+		foreach option in methodchoice_self methodchoice_joint methodchoice_other ///
+			fees_12months fp_told_other_methods fp_side_effects fp_sideeffects_instruct ///
+			return_to_provider refer_to_relative returnrefer_dir {
+			
+			preserve
+			keep if `group'==1
+			keep if mcp==1
+			
+			bysort `var': egen d_`option'_`group'=count(_n) if `option'==1 | `option'==0
+			
+			collapse (mean) d_`option'_`group', by(`var')
+			
+			*Drop irrelavent/ unused categories
+			capture drop if married==0
+			capture drop if umsexactive==0
+			capture drop if married==1 & cp_mar!=.
+			
+			*Drop unused variables
+			capture drop d_methodchoice_self_mar
+			capture drop d_methodchoice_joint_mar
+			capture drop d_methodchoice_other_mar
+			capture drop d_return_to_provider_mar
+			capture drop d_refer_to_relative_mar
+			capture drop d_returnrefer_dir_mar
+			
+			tempfile temp2
+			save `temp2', replace
+			
+			use "`CCRX'_DataViz.dta"
+			append using `temp2'
+			capture order d_`option'_`group', after(`option'_`group')
+			capture order d_fp_sideffects_instruct_`group', after(fp_side_effects_instructions_`group')
+			save "`CCRX'_DataViz.dta", replace
+			restore
+			}
+		rename fp_sideeffects_instruct fp_side_effects_instructions		
+		}
+	}
 * 
 
 ******************************************************************************************************************
