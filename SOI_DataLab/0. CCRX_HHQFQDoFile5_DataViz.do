@@ -602,29 +602,40 @@ foreach group in all mar {
 		restore
 		
 		*Generate denominators
-		foreach indicator in cp mcp tcp unmettot unmetspace unmetlimit totaldemand demandsatis visited_by_health_worker visited_facility_fp_disc fp_discussion {
+		preserve
+		keep if `group'==1
 		
-			preserve
-			keep if `group'==1
+		collapse (count) d_cp_`group'=cp ///
+						 d_mcp_`group'=mcp ///
+						 d_tcp_`group'=tcp ///
+						 d_unmettot_`group'=unmettot ///
+						 d_unmetspace_`group'=unmetspace ///
+						 d_unmetlimit_`group'=unmetlimit ///
+						 d_totaldemand_`group'=totaldemand ///
+						 d_demandsatis_`group'=demandsatis ///
+						 d_visited_by_health_worker_`group'=visited_by_health_worker ///
+						 d_visited_facility_fp_disc_`group'=visited_facility_fp_disc ///
+						 d_fp_discussion_`group'=fp_discussion, ///
+						 by(`var')
+		
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
 
-			bysort `var': egen d_`indicator'_`group'=count(_n) if `indicator'==1 | `indicator'==0
+		tempfile temp2
+		save `temp2', replace
 
-			collapse (mean) d_`indicator'_`group', by(`var')
-
-			*Drop irrelavent/ unused categories
-			capture drop if married==0
-			capture drop if umsexactive==0
-			capture drop if married==1 & cp_mar!=.
-
-			tempfile temp2
-			save `temp2', replace
-
-			use "`CCRX'_DataViz.dta"
-			append using `temp2'
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
+		foreach indicator in cp mcp tcp ///
+			unmettot unmetspace unmetlimit totaldemand demandsatis ///
+			visited_by_health_worker visited_facility_fp_disc fp_discussion {
 			capture order d_`indicator'_`group', after(`indicator'_`group')
-			save "`CCRX'_DataViz.dta", replace
-			restore
 			}
+		save "`CCRX'_DataViz.dta", replace
+		restore
+			 
 		}
 	}
 *
@@ -648,15 +659,15 @@ foreach group in all mar {
 		keep if current_method_recode!=.
 
 		collapse (mean) ster_`group'=m1 ///
-					implant_`group'=m2 ///
-						IUD_`group'=m3 ///
+					 implant_`group'=m2 ///
+					  	 IUD_`group'=m3 ///
 						dmpa_`group'=m4 ///
-					dmpasc_`group'=m5 ///
+					  dmpasc_`group'=m5 ///
 						pill_`group'=m6 ///
-						ec_`group'=m7 ///
-					condom_`group'=m8 ///
+						  ec_`group'=m7 ///
+					  condom_`group'=m8 ///
 				other_modern_`group'=m9 /// 
-				traditional_`group'=m10 ///
+				 traditional_`group'=m10 ///
 				[aw=FQweight], by(`var')
 
 		*Methods
@@ -685,45 +696,38 @@ foreach group in all mar {
 		restore
 
 		*Generate Denominators
-		foreach method in m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 {
-
-			preserve
-			keep if `group'==1
-			keep if current_method_recode!=.
+		preserve
+		keep if `group'==1
+		keep if current_method_recode!=.
 		
-			bysort `var': egen d_`method'_`group'=count(_n) if `method'==1 | `method'==0
-			
-			collapse (mean) d_`method'_`group', by(`var')
+		capture (count) d_ster_`group'=m1 ///
+						d_implant_`group'=m2 ///
+						d_IUD_`group'=m3 ///
+						d_dmpa_`group'=m4 ///
+						d_dmpasc_`group'=m5 ///
+						d_pill_`group'=m6 ///
+						d_ec_`group'=m7 ///
+						d_condom_`group'=m8 ///
+						d_other_modern_`group'=m9 ///
+						d_traditional_`group'=m10, ///
+						by(`var')
 
-			*Drop irrelavent/ unused categories
-			capture drop if married==0
-			capture drop if umsexactive==0
-			capture drop if married==1 & cp_mar!=.
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
 
-			tempfile temp2	
-			save `temp2', replace
+		tempfile temp2	
+		save `temp2', replace
 
-			use "`CCRX'_DataViz.dta"
-			append using `temp2'
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
+		foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern traditional {
 			capture order d_`method'_`group', after(`method'_`group')
-			save "`CCRX'_DataViz.dta", replace
-			restore
 			}
+		save "`CCRX'_DataViz.dta", replace
+		restore
 		}
-	preserve
-	use "`CCRX'_DataViz.dta"
-	rename d_m1_`group' d_ster_`group'
-	rename d_m2_`group' d_implant_`group'
-	rename d_m3_`group' d_IUD_`group'
-	rename d_m4_`group' d_dmpa_`group'
-	rename d_m5_`group' d_dmpasc_`group'
-	rename d_m6_`group' d_pill_`group'
-	rename d_m7_`group' d_ec_`group'
-	rename d_m8_`group' d_condom_`group'
-	rename d_m9_`group' d_other_modern_`group'
-	rename d_m10_`group' d_traditional_`group'
-	save "`CCRX'_DataViz.dta", replace
-	restore
 	}
 
 * 
@@ -793,43 +797,49 @@ foreach group in all mar {
 		restore
 		
 		*Generate Denominators
-		rename fp_side_effects_instructions fp_sideeffects_instruct
+		preserve
+		keep if `group'==1
+		keep if mcp==1
+		
+		capture (count) ///
+			d_methodchoice_self_`group'=methodchoice_self /// 
+			d_methodchoice_joint_`group'=methodchoice_joint /// 
+			d_methodchoice_other_`group'=methodchoice_other ///   
+			d_fees_12months_`group'=fees_12months ///
+			d_fp_told_other_methods_`group'=fp_told_other_methods ///
+			d_fp_side_effects_`group'=fp_side_effects ///
+			d_fp_sideeffects_instruct_`group'=fp_side_effects_instructions ///
+			d_return_to_provider_`group'=return_to_provider ///
+			d_refer_to_relative_`group'=refer_to_relative ///
+			d_returnrefer_dir_`group'=returnrefer_dir, ///
+			by(`var')
+			
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
+		
+		*Drop unused variables
+		capture drop d_methodchoice_self_mar
+		capture drop d_methodchoice_joint_mar
+		capture drop d_methodchoice_other_mar
+		capture drop d_return_to_provider_mar
+		capture drop d_refer_to_relative_mar
+		capture drop d_returnrefer_dir_mar
+			
+		tempfile temp2
+		save `temp2', replace
+
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
 		foreach option in methodchoice_self methodchoice_joint methodchoice_other ///
-			fees_12months fp_told_other_methods fp_side_effects fp_sideeffects_instruct ///
+			fees_12months fp_told_other_methods fp_side_effects ///
 			return_to_provider refer_to_relative returnrefer_dir {
-			
-			preserve
-			keep if `group'==1
-			keep if mcp==1
-			
-			bysort `var': egen d_`option'_`group'=count(_n) if `option'==1 | `option'==0
-			
-			collapse (mean) d_`option'_`group', by(`var')
-			
-			*Drop irrelavent/ unused categories
-			capture drop if married==0
-			capture drop if umsexactive==0
-			capture drop if married==1 & cp_mar!=.
-			
-			*Drop unused variables
-			capture drop d_methodchoice_self_mar
-			capture drop d_methodchoice_joint_mar
-			capture drop d_methodchoice_other_mar
-			capture drop d_return_to_provider_mar
-			capture drop d_refer_to_relative_mar
-			capture drop d_returnrefer_dir_mar
-			
-			tempfile temp2
-			save `temp2', replace
-			
-			use "`CCRX'_DataViz.dta"
-			append using `temp2'
 			capture order d_`option'_`group', after(`option'_`group')
-			capture order d_fp_sideffects_instruct_`group', after(fp_side_effects_instructions_`group')
-			save "`CCRX'_DataViz.dta", replace
-			restore
 			}
-		rename fp_sideeffects_instruct fp_side_effects_instructions		
+		capture order d_fp_sideffects_instruct_`group', after(fp_side_effects_instructions_`group')
+		save "`CCRX'_DataViz.dta", replace
+		restore
 		}
 	}
 * 
@@ -875,32 +885,33 @@ foreach group in all mar {
 		restore
 		
 		*Generate Denominators
+		preserve
+		keep if `group'==1
+		***ODK update
+		*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
+		keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1		
+		
+		capture (count) ///
+			d_wanted_then_`group'=wanted_then ///
+			d_wanted_later_`group'=wanted_later ///
+			d_wanted_not_`group'=wanted_not, ///
+			by(`var')
+			
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.	
+			
+		tempfile temp2	
+		save `temp2', replace
+
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
 		foreach intention in wanted_then wanted_later wanted_not {
-
-			preserve
-			keep if `group'==1
-			***ODK update
-			*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
-			keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1
-			
-			bysort `var': egen d_`intention'_`group'=count(_n) if `intention'==1 | `intention'==0
-			
-			collapse (mean) d_`intention'_`group', by(`var')
-			
-			*Drop irrelavent/ unused categories
-			capture drop if married==0
-			capture drop if umsexactive==0
-			capture drop if married==1 & cp_mar!=.	
-			
-			tempfile temp2	
-			save `temp2', replace
-
-			use "`CCRX'_DataViz.dta"
-			append using `temp2'
 			capture order d_`intention'_`group', after(`intention'_`group')
-			save "`CCRX'_DataViz.dta", replace
-			restore
 			}
+		save "`CCRX'_DataViz.dta", replace
+		restore
 		}
 	}
 * 
@@ -1127,26 +1138,45 @@ gen user=1 if ster_all!=.
 gen user_modern=1 if methodchoice_self!=.
 gen preg=1 if wanted_then_all!=.
 
+gen d_all=1 if d_cp_all!=.
+gen d_user=1 if d_ster_all!=.
+gen d_user_modern=1 if d_methodchoice_self!=.
+gen d_preg=1 if wanted_then_all!=.
+
 gen mar=1 if cp_mar!=. 
 gen m_user=1 if ster_mar!=.
 gen m_user_modern=1 if fees_12months_mar!=.
 gen m_preg=1 if wanted_then_mar!=.
+
+gen d_mar=1 if d_cp_mar!=.
+gen d_m_user=1 if d_ster_mar!=.
+gen d_m_user_modern=1 if d_fp_told_other_methods_mar!=.
+gen d_m_preg=1 if d_wanted_then_mar!=.
 
 *1a. ALL women
 preserve
 	keep if all==1
 	keep Country Round Date Grouping Category ///
 		cp_all mcp_all tcp_all ///
-			d_cp_all d_mcp_all d_tcp_all ///
 		unmettot_all unmetspace_all unmetlimit_all ///
-			d_unmettot_all d_unmetspace_all d_unmetlimit_all ///
 		totaldemand_all demandsatis_all ///
-			d_totaldemand_all d_demandsatis_all ///
-		visited_by_health_worker_all visited_facility_fp_disc_all fp_discussion_all ///
-			d_visited_by_health_worker_all d_visited_facility_fp_disc_all d_fp_discussion_all
+		visited_by_health_worker_all visited_facility_fp_disc_all fp_discussion_all
 	gen id=_n
 	tempfile temp_all
 	save `temp_all.dta', replace 
+restore 
+
+*Denominators
+preserve
+	keep if d_all==1
+	keep Country Round Date Grouping Category ///
+		d_cp_all d_mcp_all d_tcp_all ///
+		d_unmettot_all d_unmetspace_all d_unmetlimit_all ///
+		d_totaldemand_all d_demandsatis_all ///
+		d_visited_by_health_worker_all d_visited_facility_fp_disc_all d_fp_discussion_all
+	gen id=_n
+	tempfile temp_all_denom
+	save `temp_all_denom.dta', replace 
 restore 
 
 *1b. ALL current users 
@@ -1154,40 +1184,66 @@ restore
 preserve
 	keep if user==1
 	keep Category ///
-	ster_all implant_all IUD_all dmpa_all dmpasc_all pill_all ///
-	ec_all condom_all other_modern_all traditional_all ///
-		d_ster_all d_implant_all d_IUD_all d_dmpa_all d_dmpasc_all d_pill_all ///
-		d_ec_all d_condom_all d_other_modern_all d_traditional_all
+		ster_all implant_all IUD_all dmpa_all dmpasc_all pill_all ///
+		ec_all condom_all other_modern_all traditional_all
 	gen id=_n + 100
 	tempfile temp_user
 	save `temp_user.dta', replace 
 restore  
+
+*Denominators
+preserve
+	keep if d_user==1
+	keep Category ///
+		d_ster_all d_implant_all d_IUD_all d_dmpa_all d_dmpasc_all d_pill_all ///
+		d_ec_all d_condom_all d_other_modern_all d_traditional_all
+	gen id=_n + 100
+	tempfile temp_user_denom
+	save `temp_user_denom.dta', replace 
+restore 
 
 *1bb. ALL current MODERN users 
 preserve
 	keep if user_modern==1
 	keep Category ///
 		methodchoice_self methodchoice_joint methodchoice_other ///
-			d_methodchoice_self d_methodchoice_joint d_methodchoice_other ///
 		fp_told_other_methods_all fp_side_effects_all fp_side_effects_instructions_all ///
-			d_fp_told_other_methods_all d_fp_side_effects_all d_fp_sideeffects_instruct_all ///
 		return_to_provider refer_to_relative returnrefer_dir ///
-			d_return_to_provider d_refer_to_relative d_returnrefer_dir ///
-		fees_12months_all ///
-			d_fees_12months_all
+		fees_12months_all
 	gen id=_n + 100
 	tempfile temp_user_modern
 	save `temp_user_modern.dta', replace 
+restore 
+
+*Denominators
+preserve
+	keep if d_user_modern==1
+	keep Category ///
+		d_methodchoice_self d_methodchoice_joint d_methodchoice_other ///
+		d_fp_told_other_methods_all d_fp_side_effects_all d_fp_sideeffects_instruct_all ///
+		d_return_to_provider d_refer_to_relative d_returnrefer_dir ///
+		d_fees_12months_all
+	gen id=_n + 100
+	tempfile temp_user_modern_denom
+	save `temp_user_modern_denom.dta', replace 
 restore 
 
 *1c. ALL women with birth in past 5 years or pregnant 
 preserve
 	keep if preg==1
 	keep Category ///
-		wanted_then_all wanted_later_all wanted_not_all ///
-			d_wanted_then_all d_wanted_later_all d_wanted_not_all
+		wanted_then_all wanted_later_all wanted_not_all
 	tempfile temp_preg
 	save `temp_preg.dta', replace 
+restore 
+
+*Denominators
+preserve
+	keep if d_preg==1
+	keep Category ///
+		d_wanted_then_all d_wanted_later_all d_wanted_not_all
+	tempfile temp_preg_denom
+	save `temp_preg_denom.dta', replace 
 restore 
 
 *2a. MARRIED women 
@@ -1195,15 +1251,23 @@ preserve
 	keep if mar==1
 	keep Category ///
 		cp_mar mcp_mar tcp_mar ///
-			d_cp_mar d_mcp_mar d_tcp_mar ///
 		unmettot_mar unmetspace_mar unmetlimit_mar ///
-			d_unmettot_mar d_unmetspace_mar d_unmetlimit_mar ///
 		totaldemand_mar demandsatis_mar ///
-			d_totaldemand_mar d_demandsatis_mar ///
-		visited_by_health_worker_mar visited_facility_fp_disc_mar fp_discussion_mar ///
-			d_visited_by_health_worker_mar d_visited_facility_fp_disc_mar d_fp_discussion_mar
+		visited_by_health_worker_mar visited_facility_fp_disc_mar fp_discussion_mar
 	tempfile temp_mar
 	save `temp_mar.dta', replace
+restore
+
+*Denominators
+preserve
+	keep if d_mar==1
+	keep Category ///
+		d_cp_mar d_mcp_mar d_tcp_mar ///
+		d_unmettot_mar d_unmetspace_mar d_unmetlimit_mar ///
+		d_totaldemand_mar d_demandsatis_mar ///
+		d_visited_by_health_worker_mar d_visited_facility_fp_disc_mar d_fp_discussion_mar
+	tempfile temp_mar_denom
+	save `temp_mar_denom.dta', replace
 restore
 
 *2b. MARRIED current users
@@ -1212,11 +1276,19 @@ preserve
 	keep if m_user==1
 	keep Category ///
 		ster_mar implant_mar IUD_mar dmpa_mar dmpasc_mar pill_mar ///
-			d_ster_mar d_implant_mar d_IUD_mar d_dmpa_mar d_dmpasc_mar d_pill_mar ///
-		ec_mar condom_mar other_modern_mar traditional_mar ///
-			d_ec_mar d_condom_mar d_other_modern_mar d_traditional_mar
+		ec_mar condom_mar other_modern_mar traditional_mar
 	tempfile temp_m_user
 	save `temp_m_user.dta', replace 
+restore 
+
+*Denominators
+preserve
+	keep if d_m_user==1
+	keep Category ///
+		d_ster_mar d_implant_mar d_IUD_mar d_dmpa_mar d_dmpasc_mar d_pill_mar ///
+		d_ec_mar d_condom_mar d_other_modern_mar d_traditional_mar
+	tempfile temp_m_user_denom
+	save `temp_m_user_denom.dta', replace 
 restore 
 
 *2bb. MARRIED current users
@@ -1224,22 +1296,38 @@ preserve
 	keep if m_user_modern==1
 	keep Category ///
 		fp_told_other_methods_mar fp_side_effects_mar fp_side_effects_instructions_mar ///
-			d_fp_told_other_methods_mar d_fp_side_effects_mar d_fp_sideeffects_instruct_mar ///
-		fees_12months_mar ///
-			d_fees_12months_mar
+		fees_12months_mar
 	tempfile temp_m_user_modern
 	save `temp_m_user_modern.dta', replace 
+restore
+
+*Denominators
+preserve
+	keep if d_m_user_modern==1
+	keep Category ///
+		d_fp_told_other_methods_mar d_fp_side_effects_mar d_fp_sideeffects_instruct_mar ///
+		d_fees_12months_mar
+	tempfile temp_m_user_modern_denom
+	save `temp_m_user_modern_denom.dta', replace 
 restore
 
 *2c. MARRIED women with birth in past 5 years or pregnant 
 preserve
 	keep if m_preg==1
 	keep Category ///
-		wanted_then_mar wanted_later_mar wanted_not_mar ///
-			d_wanted_then_mar d_wanted_later_mar d_wanted_not_mar
+		wanted_then_mar wanted_later_mar wanted_not_mar
 	tempfile temp_m_preg
 	save `temp_m_preg.dta', replace 
-*restore 
+restore 
+
+*Denominators
+preserve
+	keep if m_preg==1
+	keep Category ///
+		d_wanted_then_mar d_wanted_later_mar d_wanted_not_mar
+	tempfile temp_m_preg_denom
+	save `temp_m_preg_denom.dta', replace 
+*restore
 
 *3. Merging
                      use `temp_all.dta'
@@ -1251,8 +1339,20 @@ merge 1:1 Category using `temp_mar.dta', gen(merge_mar)
 merge 1:1 Category using `temp_m_user.dta', gen(merge_m_user)
 merge 1:1 Category using `temp_m_user_modern.dta', gen(merge_m_user_modern)
 merge 1:1 Category using `temp_m_preg.dta', gen(merge_m_preg)
+
+merge 1:1 Category using `temp_user_denom.dta', gen(merge_user_denom)
+merge 1:1 Category using `temp_user_modern_denom.dta', gen(merge_user_modern_denom)
+merge 1:1 Category using `temp_preg_denom.dta', gen(merge_preg_denom)
+
+merge 1:1 Category using `temp_mar_denom.dta', gen(merge_mar_denom)
+merge 1:1 Category using `temp_m_user_denom.dta', gen(merge_m_user_denom)
+merge 1:1 Category using `temp_m_user_modern_denom.dta', gen(merge_m_user_modern_denom)
+merge 1:1 Category using `temp_m_preg_denom.dta', gen(merge_m_preg_denom)
 sort id
-drop id merge_user merge_user_modern merge_preg merge_mar merge_m_user merge_m_user_modern merge_m_preg
+save "/Users/ealarson/Desktop/`CCRX'_DataVix.dta", replace
+assert 0
+drop id merge_user merge_user_modern merge_preg merge_mar merge_m_user merge_m_user_modern merge_m_preg ///
+	merge_user_denom merge_user_modern_denom merge_preg_denom merge_mar_denom merge_m_user_denom merge_m_user_modern_denom merge_m_preg_denom
 
 foreach var in cp mcp tcp ///
 	visited_by_health_worker visited_facility_fp_disc fp_discussion ///
@@ -1265,22 +1365,23 @@ foreach var in cp mcp tcp ///
 order d_fp_sideeffects_instruct_all, after(fp_side_effects_instructions_all)
 order d_fp_sideeffects_instruct_mar, after(fp_side_effects_instructions_mar)
 
-order ster_all-d_traditional_all, after(tcp_mar)
-order ster_mar-d_traditional_mar, after(traditional_all)
+order ster_all-d_traditional_all, after(d_tcp_mar)
+order ster_mar-d_traditional_mar, after(d_traditional_all)
 order unmettot_all, after(unmetlimit_all)
-	order d_unmettot_all, after(unmettot_all)
-order unmettot_mar-d_unmetlimit_mar, after(unmettot_all)
+	*order d_unmettot_all, after(unmettot_all)
+*order unmettot_mar-d_unmetlimit_mar, after(d_unmettot_all)
 order unmettot_mar, after(unmetlimit_mar)
 	order d_unmettot_mar, after(unmettot_mar)
-order totaldemand_mar-d_demandsatis_mar, after(demandsatis_all)
-order wanted_then_all-d_wanted_not_mar, after(demandsatis_mar)
-order methodchoice_self-d_methodchoice_other, after(wanted_not_mar)
+*order totaldemand_mar-d_demandsatis_mar, after(d_demandsatis_all)
+*order wanted_then_all-d_wanted_not_mar, after(d_demandsatis_mar)
+order methodchoice_self-d_methodchoice_other, after(d_wanted_not_mar)
 order fees_12months_all, after(methodchoice_other)
 	order d_fees_12months_all, after(fees_12months_all)
 order fees_12months_mar, after(fees_12months_all)
 	order d_fees_12months_mar, after(fees_12months_mar)
-order fp_told_other_methods_all-d_fp_sideeffects_instruct_mar, after(fees_12months_mar)
-order return_to_provider-d_returnrefer_dir, after(fp_side_effects_instructions_mar)
+order fp_told_other_methods_all-d_fp_sideeffects_instruct_mar, after(d_fees_12months_mar)
+*order return_to_provider-d_returnrefer_dir, after(d_fp_sideeffects_instruct_mar)
+
 
 save "`CCRX'_DataViz.dta", replace
 exit
