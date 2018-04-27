@@ -843,38 +843,66 @@ use `temp', replace
 
 *All women | Married women
 foreach group in all mar {
-*Each grouping
-foreach var in total age5 married umsexactive parity3 ur school wealth region {
+	*Each grouping
+	foreach var in total age5 married umsexactive parity3 ur school wealth region {
 
-preserve
-keep if `group'==1
-***ODK update
-*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
-keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1
+		preserve
+		keep if `group'==1
+		***ODK update
+		*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
+		keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1
 
-collapse (mean) wanted_then_`group'=wanted_then ///
-               wanted_later_`group'=wanted_later ///
-                 wanted_not_`group'=wanted_not ///
-[aw=FQweight], by(`var')
+		collapse (mean) wanted_then_`group'=wanted_then ///
+			wanted_later_`group'=wanted_later ///
+			wanted_not_`group'=wanted_not ///
+			[aw=FQweight], by(`var')
 
-replace wanted_then_`group'=wanted_then_`group'*100 
-replace wanted_later_`group'=wanted_later_`group'*100 
-replace wanted_not_`group'=wanted_not_`group'*100 
+		replace wanted_then_`group'=wanted_then_`group'*100 
+		replace wanted_later_`group'=wanted_later_`group'*100 
+		replace wanted_not_`group'=wanted_not_`group'*100 
 
-*Drop irrelavent/ unused categories
-capture drop if married==0
-capture drop if umsexactive==0
-capture drop if married==1 & cp_mar!=.
+		*Drop irrelavent/ unused categories
+		capture drop if married==0
+		capture drop if umsexactive==0
+		capture drop if married==1 & cp_mar!=.
 
-tempfile temp2
-save `temp2', replace
+		tempfile temp2
+		save `temp2', replace
 
-use "`CCRX'_DataViz.dta"
-append using `temp2'
-save "`CCRX'_DataViz.dta", replace
-restore
-}
-}
+		use "`CCRX'_DataViz.dta"
+		append using `temp2'
+		save "`CCRX'_DataViz.dta", replace
+		restore
+		
+		*Generate Denominators
+		foreach intention in wanted_then wanted_later wanted_not {
+
+			preserve
+			keep if `group'==1
+			***ODK update
+			*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
+			keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1
+			
+			bysort `var': egen d_`intention'_`group'=count(_n) if `intention'==1 | `intention'==0
+			
+			collapse (mean) d_`intention'_`group', by(`var')
+			
+			*Drop irrelavent/ unused categories
+			capture drop if married==0
+			capture drop if umsexactive==0
+			capture drop if married==1 & cp_mar!=.	
+			
+			tempfile temp2	
+			save `temp2', replace
+
+			use "`CCRX'_DataViz.dta"
+			append using `temp2'
+			capture order d_`intention'_`group', after(`intention'_`group')
+			save "`CCRX'_DataViz.dta", replace
+			restore
+			}
+		}
+	}
 * 
 
 ******************************************************************************************************************
