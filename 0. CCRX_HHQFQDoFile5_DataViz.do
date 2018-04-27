@@ -1134,93 +1134,114 @@ gen m_preg=1 if wanted_then_mar!=.
 
 *1a. ALL women
 preserve
-keep if all==1
-keep Country Round Date Grouping Category ///
-cp_all mcp_all tcp_all ///
-unmettot_all unmetspace_all unmetlimit_all ///
-totaldemand_all demandsatis_all ///
-visited_by_health_worker_all visited_facility_fp_disc_all fp_discussion_all
-gen id=_n
-tempfile temp_all
-save `temp_all.dta', replace 
+	keep if all==1
+	keep Country Round Date Grouping Category ///
+		cp_all mcp_all tcp_all ///
+			d_cp_all d_mcp_all d_tcp_all ///
+		unmettot_all unmetspace_all unmetlimit_all ///
+			d_unmettot_all d_unmetspace_all d_unmetlimit_all ///
+		totaldemand_all demandsatis_all ///
+			d_totaldemand_all d_demandsatis_all ///
+		visited_by_health_worker_all visited_facility_fp_disc_all fp_discussion_all ///
+			d_visited_by_health_worker_all d_visited_facility_fp_disc_all d_fp_discussion_all
+	gen id=_n
+	tempfile temp_all
+	save `temp_all.dta', replace 
 restore 
 
 *1b. ALL current users 
 *SAS: removed injectables, added dmpa_all dmpasc_all ec_all
 preserve
-keep if user==1
-keep Category ///
-ster_all implant_all IUD_all dmpa_all dmpasc_all pill_all ec_all condom_all ///
-other_modern_all traditional_all
-gen id=_n + 100
-tempfile temp_user
-save `temp_user.dta', replace 
+	keep if user==1
+	keep Category ///
+	ster_all implant_all IUD_all dmpa_all dmpasc_all pill_all ///
+	ec_all condom_all other_modern_all traditional_all ///
+		d_ster_all d_implant_all d_IUD_all d_dmpa_all d_dmpasc_all d_pill_all ///
+		d_ec_all d_condom_all d_other_modern_all d_traditional_all
+	gen id=_n + 100
+	tempfile temp_user
+	save `temp_user.dta', replace 
 restore  
 
 *1bb. ALL current MODERN users 
 preserve
-keep if user_modern==1
-keep Category ///
-methodchoice_self methodchoice_joint methodchoice_other ///
-fp_told_other_methods_all fp_side_effects_all fp_side_effects_instructions_all ///
-return_to_provider refer_to_relative returnrefer_dir ///
-fees_12months_all
-gen id=_n + 100
-tempfile temp_user_modern
-save `temp_user_modern.dta', replace 
+	keep if user_modern==1
+	keep Category ///
+		methodchoice_self methodchoice_joint methodchoice_other ///
+			d_methodchoice_self d_methodchoice_joint d_methodchoice_other ///
+		fp_told_other_methods_all fp_side_effects_all fp_side_effects_instructions_all ///
+			d_fp_told_other_methods_all d_fp_side_effects_all d_fp_sideeffects_instruct_all ///
+		return_to_provider refer_to_relative returnrefer_dir ///
+			d_return_to_provider d_refer_to_relative d_returnrefer_dir ///
+		fees_12months_all ///
+			d_fees_12months_all
+	gen id=_n + 100
+	tempfile temp_user_modern
+	save `temp_user_modern.dta', replace 
 restore 
 
 *1c. ALL women with birth in past 5 years or pregnant 
 preserve
-keep if preg==1
-keep Category ///
-wanted_then_all wanted_later_all wanted_not_all
-tempfile temp_preg
-save `temp_preg.dta', replace 
+	keep if preg==1
+	keep Category ///
+		wanted_then_all wanted_later_all wanted_not_all ///
+			d_wanted_then_all d_wanted_later_all d_wanted_not_all
+	tempfile temp_preg
+	save `temp_preg.dta', replace 
 restore 
 
 *2a. MARRIED women 
 preserve
-keep if mar==1
-keep Category ///
-cp_mar mcp_mar tcp_mar ///
-unmettot_mar unmetspace_mar unmetlimit_mar ///
-totaldemand_mar demandsatis_mar ///
-visited_by_health_worker_mar visited_facility_fp_disc_mar fp_discussion_mar
-tempfile temp_mar
-save `temp_mar.dta', replace
+	keep if mar==1
+	keep Category ///
+		cp_mar mcp_mar tcp_mar ///
+			d_cp_mar d_mcp_mar d_tcp_mar ///
+		unmettot_mar unmetspace_mar unmetlimit_mar ///
+			d_unmettot_mar d_unmetspace_mar d_unmetlimit_mar ///
+		totaldemand_mar demandsatis_mar ///
+			d_totaldemand_mar d_demandsatis_mar ///
+		visited_by_health_worker_mar visited_facility_fp_disc_mar fp_discussion_mar ///
+			d_visited_by_health_worker_mar d_visited_facility_fp_disc_mar d_fp_discussion_mar
+	tempfile temp_mar
+	save `temp_mar.dta', replace
 restore
 
 *2b. MARRIED current users
 *SAS: removed injectables, added dmpa_mar dmpasc_mar ec_mar
 preserve
-keep if m_user==1
-keep Category ///
-ster_mar implant_mar IUD_mar dmpa_mar dmpasc_mar pill_mar ec_mar condom_mar ///
-other_modern_mar traditional_mar 
-tempfile temp_m_user
-save `temp_m_user.dta', replace 
+	keep if m_user==1
+	keep Category ///
+		ster_mar implant_mar IUD_mar dmpa_mar dmpasc_mar pill_mar ///
+			d_ster_mar d_implant_mar d_IUD_mar d_dmpa_mar d_dmpasc_mar d_pill_mar ///
+		ec_mar condom_mar other_modern_mar traditional_mar ///
+			d_ec_mar d_condom_mar d_other_modern_mar d_traditional_mar
+	tempfile temp_m_user
+	save `temp_m_user.dta', replace 
 restore 
 
 *2bb. MARRIED current users
 preserve
-keep if m_user_modern==1
-keep Category ///
-fp_told_other_methods_mar fp_side_effects_mar fp_side_effects_instructions_mar ///
-fees_12months_mar
-tempfile temp_m_user_modern
-save `temp_m_user_modern.dta', replace 
+	keep if m_user_modern==1
+	keep Category ///
+		fp_told_other_methods_mar fp_side_effects_mar fp_side_effects_instructions_mar ///
+			d_fp_told_other_methods_mar d_fp_side_effects_mar d_fp_sideeffects_instruct_mar ///
+		fees_12months_mar ///
+			d_fees_12months_mar
+	tempfile temp_m_user_modern
+	save `temp_m_user_modern.dta', replace 
 restore
 
 *2c. MARRIED women with birth in past 5 years or pregnant 
 preserve
-keep if m_preg==1
-keep Category ///
-wanted_then_mar wanted_later_mar wanted_not_mar
-tempfile temp_m_preg
-save `temp_m_preg.dta', replace 
+	keep if m_preg==1
+	keep Category ///
+		wanted_then_mar wanted_later_mar wanted_not_mar ///
+			d_wanted_then_mar d_wanted_later_mar d_wanted_not_mar
+	tempfile temp_m_preg
+	save `temp_m_preg.dta', replace 
 *restore 
 
+*3. Merging
                      use `temp_all.dta'
 merge 1:1 Category using `temp_user.dta', gen(merge_user)
 merge 1:1 Category using `temp_user_modern.dta', gen(merge_user_modern)
@@ -1234,23 +1255,32 @@ sort id
 drop id merge_user merge_user_modern merge_preg merge_mar merge_m_user merge_m_user_modern merge_m_preg
 
 foreach var in cp mcp tcp ///
-visited_by_health_worker visited_facility_fp_disc fp_discussion ///
-fp_told_other_methods fp_side_effects fp_side_effects_instructions ///
-visited_by_health_worker visited_facility_fp_disc fp_discussion {
-order `var'_mar, after(`var'_all)
-}
-order ster_all-traditional_all, after(tcp_mar)
-order ster_mar-traditional_mar, after(traditional_all)
+	visited_by_health_worker visited_facility_fp_disc fp_discussion ///
+	fp_told_other_methods fp_side_effects fp_side_effects_instructions ///
+	visited_by_health_worker visited_facility_fp_disc fp_discussion {
+	order `var'_mar, after(`var'_all)
+	capture order d_`var'_all, after(`var'_all)
+	capture order d_`var'_mar, after(`var'_mar)
+	}
+order d_fp_sideeffects_instruct_all, after(fp_side_effects_instructions_all)
+order d_fp_sideeffects_instruct_mar, after(fp_side_effects_instructions_mar)
+
+order ster_all-d_traditional_all, after(tcp_mar)
+order ster_mar-d_traditional_mar, after(traditional_all)
 order unmettot_all, after(unmetlimit_all)
-order unmettot_mar-unmetlimit_mar, after(unmettot_all)
+	order d_unmettot_all, after(unmettot_all)
+order unmettot_mar-d_unmetlimit_mar, after(unmettot_all)
 order unmettot_mar, after(unmetlimit_mar)
-order totaldemand_mar-demandsatis_mar, after(demandsatis_all)
-order wanted_then_all-wanted_not_mar, after(demandsatis_mar)
-order methodchoice_self-methodchoice_other, after(wanted_not_mar)
+	order d_unmettot_mar, after(unmettot_mar)
+order totaldemand_mar-d_demandsatis_mar, after(demandsatis_all)
+order wanted_then_all-d_wanted_not_mar, after(demandsatis_mar)
+order methodchoice_self-d_methodchoice_other, after(wanted_not_mar)
 order fees_12months_all, after(methodchoice_other)
+	order d_fees_12months_all, after(fees_12months_all)
 order fees_12months_mar, after(fees_12months_all)
-order fp_told_other_methods_all-fp_side_effects_instructions_mar, after(fees_12months_mar)
-order return_to_provider-returnrefer_dir, after(fp_side_effects_instructions_mar)
+	order d_fees_12months_mar, after(fees_12months_mar)
+order fp_told_other_methods_all-d_fp_sideeffects_instruct_mar, after(fees_12months_mar)
+order return_to_provider-d_returnrefer_dir, after(fp_side_effects_instructions_mar)
 
 save "`CCRX'_DataViz.dta", replace
 exit
