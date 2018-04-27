@@ -911,6 +911,7 @@ foreach group in all mar {
 
 clear
 use "`CCRX'_DataViz.dta"
+
 *Create columns for Country, Round, Date
 replace Country="`country'"
 gen Round="`round'"
@@ -920,8 +921,8 @@ order Date, after(Round)
 
 *Replace numbers with Labels before moving to Category column
 foreach var in total age5 married umsexactive parity3 ur school wealth region {
-tostring `var', force replace
-}
+	tostring `var', force replace
+	}
 
 *Same categories for all countries
 replace total="All" if total=="1" & (cp_all==. | cp_mar==.)
@@ -933,9 +934,11 @@ replace age5="35-39" if age5=="7"
 replace age5="40-44" if age5=="8"
 replace age5="45-49" if age5=="9"
 replace married="Married, or in union" if married=="1"
-*drop if married=="0"
+
+*Drop if married=="0"
 replace umsexactive="Unmarried, sexually active" if umsexactive=="1"
-*drop if umsexactive=="0"
+
+*Drop if umsexactive=="0"
 replace parity="0-1 children" if parity=="0"
 replace parity="2-3 children" if parity=="1"
 replace parity="4+ children" if parity=="2"
@@ -1008,89 +1011,90 @@ replace school="Post Primary Vocational" if school=="2" & Country=="Kenya"
              replace school="University" if school=="4" & Country=="Uganda"
 		
 *region
-replace region="Boucle_du_mouhoun" if region=="1" & Country=="Burkina"
-         replace region="Cascades" if region=="2" & Country=="Burkina"
-           replace region="Centre" if region=="3" & Country=="Burkina"
-       replace region="Centre_Est" if region=="4" & Country=="Burkina"
-      replace region="Centre_Nord" if region=="5" & Country=="Burkina"
-     replace region="Centre_Ouest" if region=="6" & Country=="Burkina"
-       replace region="Centre_Sud" if region=="7" & Country=="Burkina"
-              replace region="Est" if region=="8" & Country=="Burkina"
-    replace region="Hauts_Bassins" if region=="9" & Country=="Burkina"
-            replace region="Nord" if region=="10" & Country=="Burkina"
- replace region="Plateau_Central" if region=="11" & Country=="Burkina"
-           replace region="Sahel" if region=="12" & Country=="Burkina"
-       replace region="Sud_Ouest" if region=="13" & Country=="Burkina"
+	  replace region="Boucle_du_mouhoun" if region=="1" & Country=="Burkina"
+			   replace region="Cascades" if region=="2" & Country=="Burkina"
+			     replace region="Centre" if region=="3" & Country=="Burkina"
+			 replace region="Centre_Est" if region=="4" & Country=="Burkina"
+		    replace region="Centre_Nord" if region=="5" & Country=="Burkina"
+	   	   replace region="Centre_Ouest" if region=="6" & Country=="Burkina"
+		     replace region="Centre_Sud" if region=="7" & Country=="Burkina"
+				    replace region="Est" if region=="8" & Country=="Burkina"
+		  replace region="Hauts_Bassins" if region=="9" & Country=="Burkina"
+				   replace region="Nord" if region=="10" & Country=="Burkina"
+		replace region="Plateau_Central" if region=="11" & Country=="Burkina"
+				  replace region="Sahel" if region=="12" & Country=="Burkina"
+			  replace region="Sud_Ouest" if region=="13" & Country=="Burkina"
 
-         replace region="Kinshasa" if region=="1" & Country=="DRC_Kinshasa"
-	replace region="Kongo Central" if region=="2" & Country=="DRC_Kongo_Central"
+			   replace region="Kinshasa" if region=="1" & Country=="DRC_Kinshasa"
+		  replace region="Kongo Central" if region=="2" & Country=="DRC_Kongo_Central"
 				 
-            replace region="Addis" if region=="1" & Country=="Ethiopia"
-           replace region="Amhara" if region=="2" & Country=="Ethiopia"
-          replace region="Oromiya" if region=="3" & Country=="Ethiopia"
-             replace region="SNNP" if region=="4" & Country=="Ethiopia"
-           replace region="Tigray" if region=="5" & Country=="Ethiopia"
-            replace region="Other" if region=="6" & Country=="Ethiopia"
+				  replace region="Addis" if region=="1" & Country=="Ethiopia"
+			     replace region="Amhara" if region=="2" & Country=="Ethiopia"
+			    replace region="Oromiya" if region=="3" & Country=="Ethiopia"
+				   replace region="SNNP" if region=="4" & Country=="Ethiopia"
+			     replace region="Tigray" if region=="5" & Country=="Ethiopia"
+				  replace region="Other" if region=="6" & Country=="Ethiopia"
 
-          replace region="Ashanti" if region=="1" & Country=="Ghana"
-      replace region="Brong Ahafo" if region=="2" & Country=="Ghana"
-          replace region="Central" if region=="3" & Country=="Ghana"
-          replace region="Eastern" if region=="4" & Country=="Ghana"
-    replace region="Greater Accra" if region=="5" & Country=="Ghana"
-         replace region="Northern" if region=="6" & Country=="Ghana"
-       replace region="Upper East" if region=="7" & Country=="Ghana"
-       replace region="Upper West" if region=="8" & Country=="Ghana"
-            replace region="Volta" if region=="9" & Country=="Ghana"
-         replace region="Western" if region=="10" & Country=="Ghana"
+			    replace region="Ashanti" if region=="1" & Country=="Ghana"
+		    replace region="Brong Ahafo" if region=="2" & Country=="Ghana"
+			    replace region="Central" if region=="3" & Country=="Ghana"
+		  	    replace region="Eastern" if region=="4" & Country=="Ghana"
+		  replace region="Greater Accra" if region=="5" & Country=="Ghana"
+			   replace region="Northern" if region=="6" & Country=="Ghana"
+		     replace region="Upper East" if region=="7" & Country=="Ghana"
+		     replace region="Upper West" if region=="8" & Country=="Ghana"
+			  	  replace region="Volta" if region=="9" & Country=="Ghana"
+				replace region="Western" if region=="10" & Country=="Ghana"
 
-        replace region="Java-Bali" if region=="1" & Country=="Indonesia"
-            replace region="Other" if region=="2" & Country=="Indonesia"
+			  replace region="Java-Bali" if region=="1" & Country=="Indonesia"
+				  replace region="Other" if region=="2" & Country=="Indonesia"
 
-        replace region="Rajasthan" if region=="1" & Country=="India_Rajasthan"			
-			
-		  replace region="Bungoma" if region=="1" & Country=="Kenya"
-          replace region="Kericho" if region=="2" & Country=="Kenya"
-           replace region="Kiambu" if region=="3" & Country=="Kenya"
-		   replace region="Kilifi" if region=="4" & Country=="Kenya"
-            replace region="Kitui" if region=="5" & Country=="Kenya"
-          replace region="Nairobi" if region=="6" & Country=="Kenya"
-			replace region="Nandi" if region=="7" & Country=="Kenya"
-          replace region="Nyamira" if region=="8" & Country=="Kenya"
-            replace region="Siaya" if region=="9" & Country=="Kenya"
-         replace region="Kakamega" if region=="10" & Country=="Kenya"
-       replace region="West_Pokot" if region=="11" & Country=="Kenya"
-			
-           replace region="Niamey" if region=="1" & (Country=="Niger_National" | Country=="Niger_Niamey")
-      replace region="Other urban" if region=="2" & Country=="Niger_National"
-      replace region="Rural areas" if region=="3" & Country=="Niger_National"
-		   
-          replace region="Nigeria" if region=="1" & Country=="Nigeria_`state'"
+			  replace region="Rajasthan" if region=="1" & Country=="India_Rajasthan"			
+				
+			    replace region="Bungoma" if region=="1" & Country=="Kenya"
+			    replace region="Kericho" if region=="2" & Country=="Kenya"
+			     replace region="Kiambu" if region=="3" & Country=="Kenya"
+			     replace region="Kilifi" if region=="4" & Country=="Kenya"
+				  replace region="Kitui" if region=="5" & Country=="Kenya"
+			    replace region="Nairobi" if region=="6" & Country=="Kenya"
+				  replace region="Nandi" if region=="7" & Country=="Kenya"
+			    replace region="Nyamira" if region=="8" & Country=="Kenya"
+				  replace region="Siaya" if region=="9" & Country=="Kenya"
+			   replace region="Kakamega" if region=="10" & Country=="Kenya"
+		     replace region="West_Pokot" if region=="11" & Country=="Kenya"
+				
+			     replace region="Niamey" if region=="1" & (Country=="Niger_National" | Country=="Niger_Niamey")
+		    replace region="Other urban" if region=="2" & Country=="Niger_National"
+		    replace region="Rural areas" if region=="3" & Country=="Niger_National"
+			   
+			    replace region="Nigeria" if region=="1" & Country=="Nigeria_`state'"
+			  
+			     replace region="Kaduna" if region=="1" & Country=="Nigeria"
+			      replace region="Lagos" if region=="2" & Country=="Nigeria"
+			     replace region="Taraba" if region=="3" & Country=="Nigeria"
+				   replace region="Kano" if region=="4" & Country=="Nigeria"
+			     replace region="Rivers" if region=="5" & Country=="Nigeria"
+			   replace region="Nasarawa" if region=="6" & Country=="Nigeria"
+			    replace region="Anambra" if region=="7" & Country=="Nigeria"
 		  
-		  replace region="Kaduna" if region=="1" & Country=="Nigeria"
-		   replace region="Lagos" if region=="2" & Country=="Nigeria"
-		  replace region="Taraba" if region=="3" & Country=="Nigeria"
-		    replace region="Kano" if region=="4" & Country=="Nigeria"
-		  replace region="Rivers" if region=="5" & Country=="Nigeria"
-		replace region="Nasarawa" if region=="6" & Country=="Nigeria"
-		 replace region="Anambra" if region=="7" & Country=="Nigeria"
-		  
-  replace region="Central" if (region=="r1" | region=="1") & Country=="Uganda"
- replace region="Eastern" if (region=="r2" | region=="2")  & Country=="Uganda"
-replace region="Northern" if (region=="r3" | region=="3")  & Country=="Uganda"
- replace region="Western" if (region=="r4" | region=="4")  & Country=="Uganda"
+			    replace region="Central" if (region=="r1" | region=="1") & Country=="Uganda"
+				replace region="Eastern" if (region=="r2" | region=="2")  & Country=="Uganda"
+			   replace region="Northern" if (region=="r3" | region=="3")  & Country=="Uganda"
+				replace region="Western" if (region=="r4" | region=="4")  & Country=="Uganda"
 
 *Drop incorrect calculations for CDR1
-foreach wanted in wanted_then_all wanted_later_all wanted_not_all wanted_then_mar wanted_later_mar wanted_not_mar{
-replace `wanted'=. if Country=="DRC_Kinshasa" & Round=="Round 1"
-}
+foreach wanted in wanted_then_all wanted_later_all wanted_not_all wanted_then_mar wanted_later_mar wanted_not_mar ///
+	d_wanted_then_all d_wanted_later_all d_wanted_not_all d_wanted_then_mar d_wanted_later_mar d_wanted_not_mar {
+	replace `wanted'=. if Country=="DRC_Kinshasa" & Round=="Round 1"
+	}
 *
 
 *Create "Category" column
 rename total Category
 foreach x in age5 married umsexactive parity3 ur school wealth region {
-replace `x'="" if `x'=="."
-replace Category=`x' if `x'!=""
-}
+	replace `x'="" if `x'=="."
+	replace Category=`x' if `x'!=""
+	}
 *
 replace Category="" if Category=="."
 drop if Category=="-99" | Category=="99" | Category==""
@@ -1108,8 +1112,8 @@ replace Grouping="wealth quintile or tertile" if wealth!=""
 replace Grouping="region" if region!=""
 order Grouping, after(Date)
 foreach x in age5 married umsexactive parity ur school wealth region {
-drop `x'
-}
+	drop `x'
+	}
 *
 
 save "`CCRX'_DataViz.dta", replace
