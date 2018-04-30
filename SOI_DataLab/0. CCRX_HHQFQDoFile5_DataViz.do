@@ -24,7 +24,7 @@ set more off
 
 *Sally's directory
 cd "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ"
-local datadir "/Users/ealarson/Documents/Ghana/Data_NotShared"
+local datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/"
 *local datadir "~/Dropbox (Gates Institute)/Gates"
 */
 
@@ -700,7 +700,7 @@ foreach group in all mar {
 		keep if `group'==1
 		keep if current_method_recode!=.
 		
-		capture (count) d_ster_`group'=m1 ///
+		collapse (count) d_ster_`group'=m1 ///
 						d_implant_`group'=m2 ///
 						d_IUD_`group'=m3 ///
 						d_dmpa_`group'=m4 ///
@@ -801,7 +801,7 @@ foreach group in all mar {
 		keep if `group'==1
 		keep if mcp==1
 		
-		capture (count) ///
+		collapse (count) ///
 			d_methodchoice_self_`group'=methodchoice_self /// 
 			d_methodchoice_joint_`group'=methodchoice_joint /// 
 			d_methodchoice_other_`group'=methodchoice_other ///   
@@ -891,7 +891,7 @@ foreach group in all mar {
 		*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
 		keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1		
 		
-		capture (count) ///
+		collapse (count) ///
 			d_wanted_then_`group'=wanted_then ///
 			d_wanted_later_`group'=wanted_later ///
 			d_wanted_not_`group'=wanted_not, ///
@@ -950,9 +950,9 @@ replace married="Married, or in union" if married=="1"
 replace umsexactive="Unmarried, sexually active" if umsexactive=="1"
 
 *Drop if umsexactive=="0"
-replace parity="0-1 children" if parity=="0"
-replace parity="2-3 children" if parity=="1"
-replace parity="4+ children" if parity=="2"
+replace parity3="0-1 children" if parity3=="0"
+replace parity3="2-3 children" if parity3=="1"
+replace parity3="4+ children" if parity3=="2"
 replace ur="Urban" if ur=="1"
 replace ur="Rural" if ur=="2"
 replace wealth="Lowest" if wealth=="1"
@@ -1116,13 +1116,13 @@ gen Grouping="none" if Category!=""
 replace Grouping="age" if age5!=""
 replace Grouping="marital status" if married!=""
 replace Grouping="marital status" if umsexactive!=""
-replace Grouping="parity" if parity!=""
+replace Grouping="parity" if parity3!=""
 replace Grouping="residence" if ur!=""
 replace Grouping="education" if school!=""
 replace Grouping="wealth quintile or tertile" if wealth!=""
 replace Grouping="region" if region!=""
 order Grouping, after(Date)
-foreach x in age5 married umsexactive parity ur school wealth region {
+foreach x in age5 married umsexactive parity3 ur school wealth region {
 	drop `x'
 	}
 *
@@ -1133,6 +1133,7 @@ save "`CCRX'_DataViz.dta", replace
 * Section D. Split _all, _mar, & WASH datasets, and merge back together
 ******************************************************************************************************************
 
+capture drop all
 gen all=1 if cp_all!=. 
 gen user=1 if ster_all!=.
 gen user_modern=1 if methodchoice_self!=.
@@ -1340,6 +1341,7 @@ merge 1:1 Category using `temp_m_user.dta', gen(merge_m_user)
 merge 1:1 Category using `temp_m_user_modern.dta', gen(merge_m_user_modern)
 merge 1:1 Category using `temp_m_preg.dta', gen(merge_m_preg)
 
+merge 1:1 Category using `temp_all_denom.dta', gen(merge_all_denom)
 merge 1:1 Category using `temp_user_denom.dta', gen(merge_user_denom)
 merge 1:1 Category using `temp_user_modern_denom.dta', gen(merge_user_modern_denom)
 merge 1:1 Category using `temp_preg_denom.dta', gen(merge_preg_denom)
@@ -1349,41 +1351,14 @@ merge 1:1 Category using `temp_m_user_denom.dta', gen(merge_m_user_denom)
 merge 1:1 Category using `temp_m_user_modern_denom.dta', gen(merge_m_user_modern_denom)
 merge 1:1 Category using `temp_m_preg_denom.dta', gen(merge_m_preg_denom)
 sort id
-save "/Users/ealarson/Desktop/`CCRX'_DataVix.dta", replace
-assert 0
+
+save "`datadir'/Round5/SOI/HHQFQ/`CCRX'_DataViz_2.dta", replace
+use "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ/GHR5_DataViz_2.dta", clear
+
 drop id merge_user merge_user_modern merge_preg merge_mar merge_m_user merge_m_user_modern merge_m_preg ///
-	merge_user_denom merge_user_modern_denom merge_preg_denom merge_mar_denom merge_m_user_denom merge_m_user_modern_denom merge_m_preg_denom
+	merge_all_denom merge_user_denom merge_user_modern_denom merge_preg_denom merge_mar_denom merge_m_user_denom merge_m_user_modern_denom merge_m_preg_denom
 
-foreach var in cp mcp tcp ///
-	visited_by_health_worker visited_facility_fp_disc fp_discussion ///
-	fp_told_other_methods fp_side_effects fp_side_effects_instructions ///
-	visited_by_health_worker visited_facility_fp_disc fp_discussion {
-	order `var'_mar, after(`var'_all)
-	capture order d_`var'_all, after(`var'_all)
-	capture order d_`var'_mar, after(`var'_mar)
-	}
-order d_fp_sideeffects_instruct_all, after(fp_side_effects_instructions_all)
-order d_fp_sideeffects_instruct_mar, after(fp_side_effects_instructions_mar)
+save, replace
 
-order ster_all-d_traditional_all, after(d_tcp_mar)
-order ster_mar-d_traditional_mar, after(d_traditional_all)
-order unmettot_all, after(unmetlimit_all)
-	*order d_unmettot_all, after(unmettot_all)
-*order unmettot_mar-d_unmetlimit_mar, after(d_unmettot_all)
-order unmettot_mar, after(unmetlimit_mar)
-	order d_unmettot_mar, after(unmettot_mar)
-*order totaldemand_mar-d_demandsatis_mar, after(d_demandsatis_all)
-*order wanted_then_all-d_wanted_not_mar, after(d_demandsatis_mar)
-order methodchoice_self-d_methodchoice_other, after(d_wanted_not_mar)
-order fees_12months_all, after(methodchoice_other)
-	order d_fees_12months_all, after(fees_12months_all)
-order fees_12months_mar, after(fees_12months_all)
-	order d_fees_12months_mar, after(fees_12months_mar)
-order fp_told_other_methods_all-d_fp_sideeffects_instruct_mar, after(d_fees_12months_mar)
-*order return_to_provider-d_returnrefer_dir, after(d_fp_sideeffects_instruct_mar)
-
-
-save "`CCRX'_DataViz.dta", replace
-exit
 
 
