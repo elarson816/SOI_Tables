@@ -3,9 +3,9 @@
 	* Section 1. Read in dataset: find country & set round macro
 	* Do file 3. To add a country, follow instructions in do file 3
 
-*clear
-*local datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ"
-*cd "`datadir'"
+clear
+local datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ"
+cd "`datadir'"
 
 ********************************************************************************
 * Section 1. Read in dataset
@@ -27,9 +27,9 @@ local round 4
 use "`datadir'/ETR`round'_DataViz.dta"
 local CCRX "ETR`round'"
 */
-/*****Ghana
+*****Ghana
 local round 5
-use "`datadir'/GHR`round'_DataViz.dta"
+use "`datadir'/GHR`round'_DataViz_2.dta"
 local CCRX "GHR`round'"
 */
 /*****India
@@ -74,6 +74,8 @@ local CCRX "UGR`round'"
 
 *Generate survey_code
 do "/Users/ealarson/Documents/RandomCoding/personalpma/SOI_DataLab/3. Country codes and cleaning.do"
+
+save "`datadir'/SOI_Tables.dta", replace
 
 *All
 order survey_code, first

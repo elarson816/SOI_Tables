@@ -6,9 +6,9 @@
 		*Section 4. Add _cc to the end of char1_codes for edu, region, and facility_type
 		*In Excel API, add edu, region, and facility_type to char and char_group tabs. Add survey to survey and country tab.
 
-********************************************************************************
-* Section A. Order method resuts/denominators
-********************************************************************************
+**********************************************************************************************
+* Section A. Order method resuts/denominators, drop remaining double married denominators
+**********************************************************************************************
 		
 foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern traditional {
 	order d_`method'_all, after(`method'_all)
@@ -61,23 +61,11 @@ order visited_by_health_worker_mar-d_visited_by_health_worker_mar, after(d_visit
 order fp_discussion_all-d_fp_discussion_all, after(d_visited_by_health_worker_mar)
 order fp_discussion_mar-d_fp_discussion_mar, after(d_fp_discussion_all)
 order visited_facility_fp_disc_all-d_visited_facility_fp_disc_mar, after(d_fp_discussion_mar)
-assert 0
 
-order ster_all-d_traditional_all, after(d_tcp_mar)
-order ster_mar-d_traditional_mar, after(d_traditional_all)
-order unmettot_all, after(d_unmetlimit_all)
-	order d_unmettot_all, after(unmettot_all)
-order unmetlimit_mar-d_unmetlimit_mar, after(d_unmetlimit_all)
-order unmettot_mar, after(unmetlimit_mar)
-	order d_unmettot_mar, after(unmettot_mar)
-order wanted_then_all-d_wanted_not_mar, after(d_demandsatis_mar)
-order methodchoice_self-d_methodchoice_other, after(d_wanted_not_mar)
-order fees_12months_all, after(methodchoice_other)
-	order d_fees_12months_all, after(fees_12months_all)
-order fees_12months_mar, after(fees_12months_all)
-	order d_fees_12months_mar, after(fees_12months_mar)
-order fp_told_other_methods_all-d_fp_sideeffects_instruct_mar, after(d_fees_12months_mar)
-order return_to_provider-d_returnrefer_dir, after(d_fp_sideeffects_instruct_mar)
+unab varlist: d_*_mar
+foreach v in `varlist' {
+	replace `v'=. if Category=="Married, or in union"
+	}
 		
 ********************************************************************************
 * Section 1. Create survey_code to apply to both HHQFQ & SDP data

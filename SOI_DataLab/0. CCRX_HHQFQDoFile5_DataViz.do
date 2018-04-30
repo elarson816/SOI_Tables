@@ -1094,11 +1094,12 @@ replace school="Post Primary Vocational" if school=="2" & Country=="Kenya"
 				replace region="Western" if (region=="r4" | region=="4")  & Country=="Uganda"
 
 *Drop incorrect calculations for CDR1
+
 foreach wanted in wanted_then_all wanted_later_all wanted_not_all wanted_then_mar wanted_later_mar wanted_not_mar ///
 	d_wanted_then_all d_wanted_later_all d_wanted_not_all d_wanted_then_mar d_wanted_later_mar d_wanted_not_mar {
 	replace `wanted'=. if Country=="DRC_Kinshasa" & Round=="Round 1"
 	}
-*
+
 
 *Create "Category" column
 rename total Category
@@ -1142,7 +1143,7 @@ gen preg=1 if wanted_then_all!=.
 gen d_all=1 if d_cp_all!=.
 gen d_user=1 if d_ster_all!=.
 gen d_user_modern=1 if d_methodchoice_self!=.
-gen d_preg=1 if wanted_then_all!=.
+gen d_preg=1 if d_wanted_then_all!=.
 
 gen mar=1 if cp_mar!=. 
 gen m_user=1 if ster_mar!=.
@@ -1323,7 +1324,7 @@ restore
 
 *Denominators
 preserve
-	keep if m_preg==1
+	keep if d_m_preg==1
 	keep Category ///
 		d_wanted_then_mar d_wanted_later_mar d_wanted_not_mar
 	tempfile temp_m_preg_denom
