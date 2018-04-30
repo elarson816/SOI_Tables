@@ -3,9 +3,9 @@
 	* Section 1. Read in dataset: find country & set round macro
 	* Do file 3. To add a country, follow instructions in do file 3
 
-clear
-local datadir "~/Dropbox (Gates Institute)/PMADataManagement_All/DataVisualization/Data Lab Datasets/Datasets_wide format/HHQFQ Datasets"
-cd "~/Dropbox (Gates Institute)/PMADataManagement_All/DataVisualization/Data Lab Datasets/Datasets_API format/HHQFQ Datasets"
+*clear
+*local datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ"
+*cd "`datadir'"
 
 ********************************************************************************
 * Section 1. Read in dataset
@@ -32,7 +32,7 @@ local round 5
 use "`datadir'/GHR`round'_DataViz.dta"
 local CCRX "GHR`round'"
 */
-*****India
+/*****India
 local round 2
 use "`datadir'/INR`round'_Rajasthan_DataViz.dta"
 local CCRX "INR`round'_Rajasthan"
@@ -73,7 +73,7 @@ local CCRX "UGR`round'"
 ********************************************************************************
 
 *Generate survey_code
-do "~/Dropbox (Gates Institute)/PMADataManagement_All/DataVisualization/API do files/3. Country codes and cleaning.do"
+do "/Users/ealarson/Documents/RandomCoding/personalpma/SOI_DataLab/3. Country codes and cleaning.do"
 
 *All
 order survey_code, first

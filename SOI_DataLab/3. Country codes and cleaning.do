@@ -13,7 +13,71 @@
 foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern traditional {
 	order d_`method'_all, after(`method'_all)
 	order d_`method'_mar, after(`method'_mar)
-	}		
+	}	
+	
+foreach var in cp mcp tcp ///
+	visited_by_health_worker visited_facility_fp_disc fp_discussion ///
+	fp_told_other_methods fp_side_effects fp_side_effects_instructions ///
+	visited_by_health_worker visited_facility_fp_disc fp_discussion {
+	order `var'_mar, after(`var'_all)
+	capture order d_`var'_all, after(`var'_all)
+	capture order d_`var'_mar, after(`var'_mar)
+	}
+
+order d_fp_sideeffects_instruct_all, after(fp_side_effects_instructions_all)
+order d_fp_sideeffects_instruct_mar, after(fp_side_effects_instructions_mar)
+
+foreach var in unmetspace unmetlimit unmettot ///
+	totaldemand demandsatis ///
+	wanted_then wanted_later wanted_not ///
+	fees_12months {
+	order d_`var'_all, after(`var'_all)
+	order d_`var'_mar, after(`var'_mar)
+	}
+order d_unmetlimit_all, after(unmetlimit_all)
+
+foreach choice in methodchoice_self methodchoice_joint methodchoice_other ///
+	return_to_provider refer_to_relative returnrefer_dir {
+	order d_`choice'_all, after(`choice'_all)
+	capture order d_`choice'_mar, after(`choice'_mar)
+	}	
+
+order ster_all-d_traditional_mar, after(d_tcp_mar)
+order unmetspace_all-d_unmetspace_all, after(d_traditional_mar)
+order unmettot_all-d_unmettot_all, after(d_unmetlimit_all)
+order unmetspace_mar-d_unmetspace_mar, after(d_unmettot_all)
+order unmetlimit_mar-d_unmetlimit_mar, after(d_unmetspace_mar)
+order unmettot_mar-d_unmettot_mar, after(d_unmetlimit_mar)
+order totaldemand_mar-d_demandsatis_mar, after(d_demandsatis_all)
+order wanted_then_all-d_wanted_not_all, after(d_demandsatis_mar)
+order wanted_then_mar-d_wanted_not_mar, after(d_wanted_not_all)
+order methodchoice_self_all-d_methodchoice_other_all, after(d_wanted_not_mar)
+order fees_12months_all-d_fees_12months_all, after(d_methodchoice_other_all)
+order fees_12months_mar-d_fees_12months_mar, after(d_fees_12months_all)
+order fp_told_other_methods_all-d_fp_sideeffects_instruct_all, after(d_fees_12months_mar)
+order return_to_provider_all-d_returnrefer_dir_all, after(d_fp_sideeffects_instruct_mar)
+order visited_by_health_worker_all-d_visited_by_health_worker_all, after(d_returnrefer_dir_all)
+order visited_by_health_worker_mar-d_visited_by_health_worker_mar, after(d_visited_by_health_worker_all)
+order fp_discussion_all-d_fp_discussion_all, after(d_visited_by_health_worker_mar)
+order fp_discussion_mar-d_fp_discussion_mar, after(d_fp_discussion_all)
+order visited_facility_fp_disc_all-d_visited_facility_fp_disc_mar, after(d_fp_discussion_mar)
+assert 0
+
+order ster_all-d_traditional_all, after(d_tcp_mar)
+order ster_mar-d_traditional_mar, after(d_traditional_all)
+order unmettot_all, after(d_unmetlimit_all)
+	order d_unmettot_all, after(unmettot_all)
+order unmetlimit_mar-d_unmetlimit_mar, after(d_unmetlimit_all)
+order unmettot_mar, after(unmetlimit_mar)
+	order d_unmettot_mar, after(unmettot_mar)
+order wanted_then_all-d_wanted_not_mar, after(d_demandsatis_mar)
+order methodchoice_self-d_methodchoice_other, after(d_wanted_not_mar)
+order fees_12months_all, after(methodchoice_other)
+	order d_fees_12months_all, after(fees_12months_all)
+order fees_12months_mar, after(fees_12months_all)
+	order d_fees_12months_mar, after(fees_12months_mar)
+order fp_told_other_methods_all-d_fp_sideeffects_instruct_mar, after(d_fees_12months_mar)
+order return_to_provider-d_returnrefer_dir, after(d_fp_sideeffects_instruct_mar)
 		
 ********************************************************************************
 * Section 1. Create survey_code to apply to both HHQFQ & SDP data
@@ -289,4 +353,3 @@ replace Category = subinstr(Category, ", ", "_", .)
 replace Category = subinstr(Category, " ", "_", .)
 replace Category = subinstr(Category, "+", "", .)
 
-assert 0
