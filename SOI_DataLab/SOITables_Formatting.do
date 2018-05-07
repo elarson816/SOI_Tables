@@ -108,7 +108,7 @@ preserve
 	keep if user_modern==1
 	keep Category ///
 		methodchoice_self methodchoice_joint methodchoice_other ///
-		fp_told_other_methods_all fp_side_effects_all fp_side_effects_instructions_all ///
+		fp_told_other_methods_all fp_side_effects_all fp_sideeffects_instruct_all ///
 		return_to_provider refer_to_relative returnrefer_dir ///
 		fees_12months_all
 	gen id=_n + 100
@@ -196,7 +196,7 @@ restore
 preserve
 	keep if m_user_modern==1
 	keep Category ///
-		fp_told_other_methods_mar fp_side_effects_mar fp_side_effects_instructions_mar ///
+		fp_told_other_methods_mar fp_side_effects_mar fp_sideeffects_instruct_mar ///
 		fees_12months_mar
 	tempfile temp_m_user_modern
 	save `temp_m_user_modern.dta', replace 
@@ -280,13 +280,11 @@ foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern tradi
 
 foreach choice in methodchoice_self methodchoice_joint methodchoice_other ///
 	fees_12months ///
-	fp_told_other_methods fp_side_effects ///
+	fp_told_other_methods fp_side_effects fp_sideeffects_instruct ///
 	return_to_provider refer_to_relative returnrefer_dir {
 	order d_`choice'_all, after(`choice'_all)
 	capture order d_`choice'_mar, after(`choice'_mar)
 	}	
-order d_fp_sideeffects_instruct_all, after(fp_side_effects_instructions_all)
-order d_fp_sideeffects_instruct_mar, after(fp_side_effects_instructions_mar)
 
 	
 foreach var in wanted_then wanted_later wanted_not ///
@@ -369,8 +367,8 @@ order fp_told_other_methods_all-d_fp_told_other_methods_all, after(d_fees_12mont
 order fp_told_other_methods_mar-d_fp_told_other_methods_mar, after(d_fp_told_other_methods_all)
 order fp_side_effects_all-d_fp_side_effects_all, after(d_fp_told_other_methods_mar)
 order fp_side_effects_mar-d_fp_side_effects_mar, after(d_fp_side_effects_all)
-order fp_side_effects_instructions_all-d_fp_sideeffects_instruct_all, after(d_fp_side_effects_mar)
-order fp_side_effects_instructions_mar-d_fp_sideeffects_instruct_mar, after(d_fp_sideeffects_instruct_all)
+order fp_sideeffects_instruct_all-d_fp_sideeffects_instruct_all, after(d_fp_side_effects_mar)
+order fp_sideeffects_instruct_mar-d_fp_sideeffects_instruct_mar, after(d_fp_sideeffects_instruct_all)
 
 **Perceived quality of care for family planning
 order return_to_provider_all-d_return_to_provider_all, after(d_fp_sideeffects_instruct_mar)

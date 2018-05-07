@@ -309,7 +309,7 @@ foreach group in all mar {
 			fees_12months_`group'=fees_12months ///
 			fp_told_other_methods_`group'=fp_told_other_methods ///
 			fp_side_effects_`group'=fp_side_effects ///
-			fp_side_effects_instructions_`group'=fp_side_effects_instructions ///
+			fp_sideeffects_instruct_`group'=fp_side_effects_instructions ///
 			return_to_provider_`group'=return_to_provider ///
 			refer_to_relative_`group'=refer_to_relative ///
 			returnrefer_dir_`group'=returnrefer_dir ///
@@ -324,7 +324,7 @@ foreach group in all mar {
 		*Method info
 		replace fp_told_other_methods_`group'=fp_told_other_methods_`group'*100
 		replace fp_side_effects_`group'=fp_side_effects_`group'*100
-		replace fp_side_effects_instructions_`group'=fp_side_effects_instructions_`group'*100
+		replace fp_sideeffects_instruct_`group'=fp_sideeffects_instruct_`group'*100
 		*Would return and/or refer
 		replace return_to_provider_`group'=return_to_provider_`group'*100
 		replace refer_to_relative_`group'=refer_to_relative_`group'*100
