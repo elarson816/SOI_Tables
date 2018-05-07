@@ -10,10 +10,11 @@ cd "$datadir"
 *Country Code
 local CCRX $CCRX
 use "$datadir/`CCRX'_SOIPrep_countryspecific.dta", clear
-assert 0
 
-WHY IS IT DIAGONAL!? COME BACK AND PUT INTO WIDE FORMAT
-gen 
+
+
+gen percent=1 if percent_of_total!=.
+gen unweighted=1 if unweighted_count!=.
 
 capture drop all
 gen all=1 if cp_all!=. 
@@ -35,6 +36,23 @@ gen d_mar=1 if d_cp_mar!=.
 gen d_m_user=1 if d_ster_mar!=.
 gen d_m_user_modern=1 if d_fp_told_other_methods_mar!=.
 gen d_m_preg=1 if d_wanted_then_mar!=.
+
+*A. Background Characteristics
+preserve
+	keep if percent==1
+	keep Category percent_of_total weighted_count
+	gen id=_n
+	tempfile temp_percent
+	save `temp_percent.dta', replace
+restore
+
+preserve
+	keep if unweighted==1
+	keep Category unweighted_count
+	gen id=_n
+	tempfile temp_unweighted
+	save `temp_unweighted.dta', replace
+restore
 
 *1a. ALL women
 preserve
@@ -214,6 +232,9 @@ restore
 
 *3. Merging
                      use `temp_all.dta', clear
+merge 1:1 Category using `temp_percent.dta', gen(merge_percent)
+merge 1:1 Category using `temp_unweighted.dta', gen(merge_unweighted)
+
 merge 1:1 Category using `temp_user.dta', gen(merge_user)
 merge 1:1 Category using `temp_user_modern.dta', gen(merge_user_modern)
 merge 1:1 Category using `temp_preg.dta', gen(merge_preg)
@@ -237,9 +258,8 @@ sort id
 save "$datadir/`CCRX'_SOITable_DataViz.dta", replace
 use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
 
-drop id merge_user merge_user_modern merge_preg merge_mar merge_m_user merge_m_user_modern merge_m_preg ///
-	merge_all_denom merge_user_denom merge_user_modern_denom merge_preg_denom merge_mar_denom merge_m_user_denom merge_m_user_modern_denom merge_m_preg_denom	
-	
+drop id merge*
+
 save, replace
 
 *4. Ordering
@@ -275,8 +295,12 @@ foreach var in wanted_then wanted_later wanted_not ///
 	order d_`var'_mar, after(`var'_mar)
 	}	
 
+
+**Background
+order percent_of_total-unweighted_count, after(Category)
+	
 **Current use of contraception by background characteristics
-order cp_all-d_cp_all, after(Category)
+order cp_all-d_cp_all, after(unweighted_count)
 order cp_mar-d_cp_mar, after(d_cp_all)
 order mcp_all-d_mcp_all, after(d_cp_all)
 order mcp_mar-d_mcp_mar, after(d_mcp_all)

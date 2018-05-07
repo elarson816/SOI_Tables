@@ -522,4 +522,5 @@ include `vargen'
 include `countryspecific'
 include `formatting'
 use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
+export delimited using "`CCRX'_SOITable_$date", replace
 

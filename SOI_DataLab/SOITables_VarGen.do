@@ -59,15 +59,15 @@ save `temp', replace
 ****************************************************************************************************************** 
 * Section 2. Background Characteristics
 ******************************************************************************************************************
-foreach var in age5 married umsexactive parity3 ur school wealth region {
+foreach var in total age5 married umsexactive parity3 ur school wealth region {
 	preserve
 	
 	collapse (count) one [pw=FQweight], by(`var')
-	egen total=sum(one) 
-	gen percent_`var'=(one/total)*100
+	egen sum=sum(one) 
+	gen percent_`var'=(one/sum)*100
 	gen count_weighted_`var'=one
 	drop one
-	drop total
+	drop sum
 	
 	tempfile temp2
 	save `temp2', replace
@@ -91,6 +91,23 @@ foreach var in age5 married umsexactive parity3 ur school wealth region {
 	save "`CCRX'_SOIPrep_vargen.dta", replace
 	restore
 	}
+	
+*Combine into one variable
+preserve
+	use "`CCRX'_SOIPrep_vargen.dta"
+		gen percent_of_total=.
+		gen weighted_count=.
+		gen unweighted_count=.
+	foreach v in total age5 married umsexactive parity3 ur school wealth region {
+		replace percent_of_total=percent_`v' if percent_`v'!=.
+		replace weighted_count=count_weighted_`v' if count_weighted_`v'!=.
+		replace unweighted_count=count_unweighted_`v' if count_unweighted_`v'!=.
+		}
+	capture drop if married==0
+	capture drop if umsexactive==0
+	capture drop if married==1 & cp_mar!=.	
+	save "`CCRX'_SOIPrep_vargen.dta", replace
+restore	
 		
 ****************************************************************************************************************** 
 * Section 3. ALL women
@@ -174,6 +191,7 @@ foreach group in all mar {
 			 
 		}
 	}
+
 *
 
 ******************************************************************************************************************
