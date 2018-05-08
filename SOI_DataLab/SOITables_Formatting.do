@@ -11,10 +11,18 @@ cd "$datadir"
 local CCRX $CCRX
 use "$datadir/`CCRX'_SOIPrep_countryspecific.dta", clear
 
-
-
+*Generate one variable per dataset
 gen percent=1 if percent_of_total!=.
 gen unweighted=1 if unweighted_count!=.
+
+gen total_all=1 if total_all_all!=.
+gen total_mar=1 if total_all_mar!=.
+gen total_cu_all=1 if total_currentusers_all!=.
+gen total_cu_mar=1 if total_currentusers_mar!=.
+gen total_mu_all=1 if total_modernusers_all!=.
+gen total_mu_mar=1 if total_modernusers_mar!=.
+gen total_rb_all=1 if total_recentbirth_all!=.
+gen total_rb_mar=1 if total_recentbirth_mar!=.
 
 capture drop all
 gen all=1 if cp_all!=. 
@@ -230,6 +238,63 @@ preserve
 	save `temp_m_preg_denom.dta', replace 
 restore
 
+*Totals
+preserve
+	keep if total_all==1
+	keep Category total_all_all
+	tempfile temp_total_all
+	save `temp_total_all.dta', replace
+restore
+
+preserve
+	keep if total_mar==1
+	keep Category total_all_mar
+	tempfile temp_total_mar
+	save `temp_total_mar.dta', replace
+restore
+
+preserve
+	keep if total_cu_all==1
+	keep Category total_currentusers_all
+	tempfile temp_total_cu_all
+	save `temp_total_cu_all.dta', replace
+restore
+
+preserve
+	keep if total_cu_mar==1
+	keep Category total_currentusers_mar
+	tempfile temp_total_cu_mar
+	save `temp_total_cu_mar.dta', replace
+restore
+
+preserve
+	keep if total_mu_all==1
+	keep Category total_modernusers_all
+	tempfile temp_total_mu_all
+	save `temp_total_mu_all.dta', replace
+restore
+
+preserve
+	keep if total_mu_mar==1
+	keep Category total_modernusers_mar
+	tempfile temp_total_mu_mar
+	save `temp_total_mu_mar.dta', replace
+restore
+
+preserve
+	keep if total_rb_all==1
+	keep Category total_recentbirth_all
+	tempfile temp_total_rb_all
+	save `temp_total_rb_all.dta', replace
+restore
+
+preserve
+	keep if total_rb_mar==1
+	keep Category total_recentbirth_mar
+	tempfile temp_total_rb_mar
+	save `temp_total_rb_mar.dta', replace
+restore
+
 *3. Merging
                      use `temp_all.dta', clear
 merge 1:1 Category using `temp_percent.dta', gen(merge_percent)
@@ -253,16 +318,48 @@ merge 1:1 Category using `temp_mar_denom.dta', gen(merge_mar_denom)
 merge 1:1 Category using `temp_m_user_denom.dta', gen(merge_m_user_denom)
 merge 1:1 Category using `temp_m_user_modern_denom.dta', gen(merge_m_user_modern_denom)
 merge 1:1 Category using `temp_m_preg_denom.dta', gen(merge_m_preg_denom)
-sort id
 
+merge 1:1 Category using `temp_total_all.dta', gen(merge_total_all)
+merge 1:1 Category using `temp_total_mar.dta', gen(merge_total_mar)
+merge 1:1 Category using `temp_total_cu_all.dta', gen(merge_total_cu_all)
+merge 1:1 Category using `temp_total_cu_mar.dta', gen(merge_total_cu_mar)
+merge 1:1 Category using `temp_total_mu_all.dta', gen(merge_total_mu_all)
+merge 1:1 Category using `temp_total_mu_mar.dta', gen(merge_total_mu_mar)
+merge 1:1 Category using `temp_total_rb_all.dta', gen(merge_total_rb_all)
+merge 1:1 Category using `temp_total_rb_mar.dta', gen(merge_total_rb_mar)
+
+sort id
 save "$datadir/`CCRX'_SOITable_DataViz.dta", replace
 use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
 
 drop id merge*
-
 save, replace
 
-*4. Ordering
+*4. Replace Total Denominators
+foreach group in all mar {
+	foreach indicator in cp mcp tcp ///
+		unmettot unmetspace unmetlimit totaldemand demandsatis ///
+		visited_by_health_worker visited_facility_fp_disc fp_discussion {
+		replace d_`indicator'_`group'=round(total_all_`group', 1) if Category=="All"
+		}
+	foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern traditional {
+		replace d_`method'_`group'=round(total_currentusers_`group', 1) if Category=="All"
+		}
+	foreach option in methodchoice_self methodchoice_joint methodchoice_other ///
+		fees_12months fp_told_other_methods fp_side_effects ///
+		return_to_provider refer_to_relative returnrefer_dir {
+		capture replace d_`option'_`group'=round(total_modernusers_`group', 1) if Category=="All"
+		}
+	foreach intention in wanted_then wanted_later wanted_not {
+		replace d_`intention'_`group'=round(total_recentbirth_`group', 1) if Category=="All"
+		}
+	}
+drop total_*
+
+save "$datadir/`CCRX'_SOITable_DataViz.dta", replace
+use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
+
+*5. Ordering
 foreach var in cp mcp tcp ///
 	unmetspace unmetlimit unmettot ///
 	totaldemand demandsatis ///
@@ -300,7 +397,7 @@ order percent_of_total-unweighted_count, after(Category)
 **Current use of contraception by background characteristics
 order cp_all-d_cp_all, after(unweighted_count)
 order cp_mar-d_cp_mar, after(d_cp_all)
-order mcp_all-d_mcp_all, after(d_cp_all)
+order mcp_all-d_mcp_all, after(d_cp_mar)
 order mcp_mar-d_mcp_mar, after(d_mcp_all)
 order tcp_all-d_tcp_all, after(d_mcp_mar)
 order tcp_mar-d_tcp_mar, after(d_tcp_all)

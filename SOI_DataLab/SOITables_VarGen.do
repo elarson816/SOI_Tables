@@ -153,8 +153,8 @@ foreach group in all mar {
 		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
-		
-		*Generate denominators
+	
+	*Generate Denominators 
 		preserve
 		keep if `group'==1
 		
@@ -185,10 +185,24 @@ foreach group in all mar {
 			unmettot unmetspace unmetlimit totaldemand demandsatis ///
 			visited_by_health_worker visited_facility_fp_disc fp_discussion {
 			capture order d_`indicator'_`group', after(`indicator'_`group')
+
+			save "`CCRX'_SOIPrep_vargen.dta", replace
 			}
-		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
-			 
+	
+		*Generate Total
+		preserve
+		keep if `group'==1
+		
+		collapse (count) total_all_`group'=cp ///
+						 [pw=FQweight], by(total)
+		tempfile temp2
+		save `temp2', replace
+		
+		use "`CCRX'_SOIPrep_vargen.dta"
+		append using `temp2'
+		save "`CCRX'_SOIPrep_vargen.dta", replace
+		restore	
 		}
 	}
 
@@ -231,7 +245,7 @@ foreach group in all mar {
 		replace dmpa_`group'=dmpa_`group'*100
 		replace dmpasc_`group'=dmpasc_`group'*100  
 		replace pill_`group'=pill_`group'*100
-		replace ec_`group'=pill_`group'*100 
+		replace ec_`group'=ec_`group'*100 
 		replace condom_`group'=condom_`group'*100 
 		replace other_modern_`group'=other_modern_`group'*100 
 		replace traditional_`group'=traditional_`group'*100  
@@ -248,23 +262,23 @@ foreach group in all mar {
 		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
-
+	
 		*Generate Denominators
 		preserve
 		keep if `group'==1
 		keep if current_method_recode!=.
 		
 		collapse (count) d_ster_`group'=m1 ///
-						d_implant_`group'=m2 ///
-						d_IUD_`group'=m3 ///
-						d_dmpa_`group'=m4 ///
-						d_dmpasc_`group'=m5 ///
-						d_pill_`group'=m6 ///
-						d_ec_`group'=m7 ///
-						d_condom_`group'=m8 ///
-						d_other_modern_`group'=m9 ///
-						d_traditional_`group'=m10, ///
-						by(`var')
+						 d_implant_`group'=m2 ///
+						 d_IUD_`group'=m3 ///
+						 d_dmpa_`group'=m4 ///
+						 d_dmpasc_`group'=m5 ///
+						 d_pill_`group'=m6 ///
+						 d_ec_`group'=m7 ///
+						 d_condom_`group'=m8 ///
+						 d_other_modern_`group'=m9 ///
+						 d_traditional_`group'=m10, ///
+						 by(`var')
 
 		*Drop irrelavent/ unused categories
 		capture drop if married==0
@@ -278,12 +292,26 @@ foreach group in all mar {
 		append using `temp2'
 		foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern traditional {
 			capture order d_`method'_`group', after(`method'_`group')
+			save "`CCRX'_SOIPrep_vargen.dta", replace
 			}
+		restore
+		
+		*Generate Total
+		preserve
+		keep if `group'==1
+		
+		collapse (count) total_currentusers_`group'=m1 ///
+						 [pw=FQweight], by(total)
+		tempfile temp2
+		save `temp2', replace
+		
+		use "`CCRX'_SOIPrep_vargen.dta"
+		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
 		}
 	}
-
+	
 * 
 
 ******************************************************************************************************************
@@ -349,12 +377,13 @@ foreach group in all mar {
 		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
-		
+
+	
 		*Generate Denominators
 		preserve
 		keep if `group'==1
 		keep if mcp==1
-		
+			
 		collapse (count) ///
 			d_methodchoice_self_`group'=methodchoice_self /// 
 			d_methodchoice_joint_`group'=methodchoice_joint /// 
@@ -367,12 +396,12 @@ foreach group in all mar {
 			d_refer_to_relative_`group'=refer_to_relative ///
 			d_returnrefer_dir_`group'=returnrefer_dir, ///
 			by(`var')
-			
+				
 		*Drop irrelavent/ unused categories
 		capture drop if married==0
 		capture drop if umsexactive==0
 		capture drop if married==1 & cp_mar!=.
-		
+			
 		*Drop unused variables
 		capture drop d_methodchoice_self_mar
 		capture drop d_methodchoice_joint_mar
@@ -380,7 +409,7 @@ foreach group in all mar {
 		capture drop d_return_to_provider_mar
 		capture drop d_refer_to_relative_mar
 		capture drop d_returnrefer_dir_mar
-			
+				
 		tempfile temp2
 		save `temp2', replace
 
@@ -390,8 +419,24 @@ foreach group in all mar {
 			fees_12months fp_told_other_methods fp_side_effects ///
 			return_to_provider refer_to_relative returnrefer_dir {
 			capture order d_`option'_`group', after(`option'_`group')
+			capture order d_fp_sideffects_instruct_`group', after(fp_side_effects_instructions_`group')
+			save "`CCRX'_SOIPrep_vargen.dta", replace
 			}
-		capture order d_fp_sideffects_instruct_`group', after(fp_side_effects_instructions_`group')
+		restore
+		
+				
+		*Generate Total
+		preserve
+		keep if `group'==1
+		keep if mcp==1
+		
+		collapse (count) total_modernusers_`group'=methodchoice_self ///
+						 [pw=FQweight], by(total)
+		tempfile temp2
+		save `temp2', replace
+		
+		use "`CCRX'_SOIPrep_vargen.dta"
+		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
 		}
@@ -437,25 +482,25 @@ foreach group in all mar {
 		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
-		
+	
 		*Generate Denominators
 		preserve
 		keep if `group'==1
 		***ODK update
 		*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
 		keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1		
-		
+			
 		collapse (count) ///
 			d_wanted_then_`group'=wanted_then ///
 			d_wanted_later_`group'=wanted_later ///
 			d_wanted_not_`group'=wanted_not, ///
 			by(`var')
-			
+				
 		*Drop irrelavent/ unused categories
 		capture drop if married==0
 		capture drop if umsexactive==0
 		capture drop if married==1 & cp_mar!=.	
-			
+				
 		tempfile temp2	
 		save `temp2', replace
 
@@ -463,7 +508,24 @@ foreach group in all mar {
 		append using `temp2'
 		foreach intention in wanted_then wanted_later wanted_not {
 			capture order d_`intention'_`group', after(`intention'_`group')
+			save "`CCRX'_SOIPrep_vargen.dta", replace
 			}
+		restore
+				
+		*Generate Total
+		preserve
+		keep if `group'==1
+		***ODK update
+		*keep if (birth_events>0 & birth_events!=. & tsinceb<60) | pregnant==1
+		keep if (children_born>0 & children_born!=. & tsinceb<60) | pregnant==1		
+			
+		collapse (count) total_recentbirth_`group'=wanted_then ///
+						 [pw=FQweight], by(total)
+		tempfile temp2
+		save `temp2', replace
+		
+		use "`CCRX'_SOIPrep_vargen.dta"
+		append using `temp2'
 		save "`CCRX'_SOIPrep_vargen.dta", replace
 		restore
 		}
