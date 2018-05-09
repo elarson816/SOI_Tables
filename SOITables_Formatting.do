@@ -9,6 +9,10 @@ cd "$datadir"
 
 *Country Code
 local CCRX $CCRX
+local country $country
+local round $round
+local today $today
+local date $date
 use "$datadir/`CCRX'_SOIPrep_countryspecific.dta", clear
 
 *Generate one variable per dataset
@@ -403,7 +407,7 @@ order tcp_all-d_tcp_all, after(d_mcp_mar)
 order tcp_mar-d_tcp_mar, after(d_tcp_all)
 
 **Contraceptive method mix by background characteristics
-order ster_all-d_ster_all, after(d_tcp_all)
+order ster_all-d_ster_all, after(d_tcp_mar)
 order implant_all-d_implant_all, after(d_ster_all)
 order IUD_all-d_IUD_all, after(d_implant_all)
 order dmpa_all-d_dmpa_all, after(d_IUD_all)
@@ -480,12 +484,12 @@ order visited_facility_fp_disc_mar-d_visited_facility_fp_disc_mar, after(d_visit
 order fp_discussion_all-d_fp_discussion_all, after(d_visited_facility_fp_disc_mar)
 order fp_discussion_mar-d_fp_discussion_mar, after(d_fp_discussion_all)
 
-
-	
 *Remove all double marriage variables	
-unab varlist: d_*_mar
+unab varlist: *_mar
 foreach v in `varlist' {
 	replace `v'=. if Category=="Married, or in union"
+	replace `v'=. if Category=="Unmarried, sexually active"
 	}
+
 	
 save, replace

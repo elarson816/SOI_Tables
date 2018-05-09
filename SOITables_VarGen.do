@@ -14,6 +14,7 @@ use `temp', replace
 local CCRX $CCRX
 local country $country
 local round $round
+local today $today
 local date $date
 
 *Recode return/ refer

@@ -11,6 +11,7 @@ cd "$datadir"
 local CCRX $CCRX
 local country $country
 local round $round
+local today $today
 local date $date
 
 use "`CCRX'_SOIPrep_vargen.dta"

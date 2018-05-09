@@ -24,14 +24,18 @@ set more off
 *Directory
 local analysisdata "/Users/ealarson/Dropbox (Gates Institute)/9 Data Management - Non-Francophone/Ghana/PMAGH_Datasets/Round5/Analysis"
 global datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ"
-local dofiles "/Users/ealarson/Documents/RandomCoding/personalpma/SOI_DataLab"
+local dofiles "/Users/ealarson/Documents/RandomCoding/SOI_Tables"
 cd "$datadir"
 
 *Macros for .do files subsequent .do files
 local vargen "`dofiles'/SOITables_VarGen.do"
 local countryspecific "`dofiles'/SOITables_CountrySpecific.do"
 local formatting "`dofiles'/SOITables_Formatting.do"
-*/
+
+*Date Macro
+local today=c(current_date)
+local c_today= "`today'"
+global today=subinstr("`c_today'", " ", "",.)
 
 /*BFR1
 use "`analysisdata'/BFR1_HHQFQ_AnalysisData.dta", clear
@@ -522,5 +526,5 @@ include `vargen'
 include `countryspecific'
 include `formatting'
 use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
-export delimited using "`CCRX'_HHQFQ_SOITable_$date", replace
+export delimited using "`CCRX'_HHQFQ_SOITable_$today", replace
 
