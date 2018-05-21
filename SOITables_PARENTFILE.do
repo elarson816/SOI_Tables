@@ -25,9 +25,11 @@ set more off
 local analysisdata "/Users/ealarson/Dropbox (Gates Institute)/9 Data Management - Non-Francophone/Ghana/PMAGH_Datasets/Round5/Analysis"
 global datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/HHQFQ"
 local dofiles "/Users/ealarson/Documents/RandomCoding/SOI_Tables"
+global csv_results "$datadir/csv_results"
 cd "$datadir"
 
 *Macros for .do files subsequent .do files
+local othertables "`dofiles'/SOITables_OtherTables.do"
 local vargen "`dofiles'/SOITables_VarGen.do"
 local countryspecific "`dofiles'/SOITables_CountrySpecific.do"
 local formatting "`dofiles'/SOITables_Formatting.do"
@@ -519,94 +521,14 @@ recode school 2=1 3=2 4=2 5=3 6=4
 rename DHSregionnum region
 */
 
-/******************************************************************************************************************
-Generate Response Rates
-******************************************************************************************************************/
-local CCRX $CCRX
-
-* Household Response Rates
-preserve
-keep if metatag==1
-keep HHQ_result ur
-
-recode HHQ_result (nonmiss=1), gen(HHQ_selected)
-recode HHQ_result (1 2 3 4 5=1) (nonmiss=.), gen(HHQ_occupied)
-recode HHQ_result (1=1) (nonmiss=.), gen(HHQ_completed)
-
-collapse (count) HHQ_selected HHQ_occupied HHQ_completed, by(ur)
-
-set obs 3
-replace ur=3 if ur==.
-	label define ur_tot 1 "1. urban" 2 "2. rural" 3 "3. total"
-	label val ur ur_tot
-
-foreach v in HHQ_selected HHQ_occupied HHQ_completed {
-	egen `v'_total=sum(`v')
-	replace `v'=`v'_total if ur==3
-	drop `v'_total
-	}
-	
-gen HHQ_response=(HHQ_completed/HHQ_occupied)
-
-save "`CCRX'_SOITable_ResponseRates.dta", replace
-restore
-
-* Female Response Rates
-preserve
-capture confirm last_night
-if _rc==0 {
-	gen last_night=1 if usual_member==1 | usual_member==3
-	}
-
-keep eligible HHQ_result last_night FRS_result ur
-	
-recode eligible (1=1) (nonmiss=.) if HHQ_result==1 & last_night==1, gen(FQeligible_total) 
-recode eligible (1=1) (nonmiss=1) if HHQ_result==1 & FRS_result==1 & last_night==1, gen(FQeligible_interviewed)
-gen FQresponse_0=1 if eligible==1 & HHQ_result==1 & last_night==1
-gen FQresponse_1=1 if FRS_result==1 & eligible==1 & HHQ_result==1 & last_night==1
-
-collapse (count) FQeligible_total FQeligible_interviewed FQresponse_1 FQresponse_0, by(ur)
-
-set obs 3
-replace ur=3 if ur==.
-	label val ur ur_tot
-	
-foreach v in FQeligible_total FQeligible_interviewed FQresponse_1 FQresponse_0 {
-	egen `v'_total=sum(`v')
-	replace `v'=`v'_total if ur==3
-	drop `v'_total
-	}
-
-gen FQ_response=(FQresponse_1/FQresponse_0)
-	drop FQresponse_1 FQresponse_0
-	
-tempfile FQ_response
-save `FQ_response', replace
-restore
-
-*Combine and generate dataset
-preserve
-use "`CCRX'_SOITable_ResponseRates.dta", clear
-merge 1:1 ur using `FQ_response'
-drop _merge
-save, replace
-export delimited using "`CCRX'_HHQFQ_SOITable_ResponseRates_$today", replace
-restore
 
 /******************************************************************************************************************
 Run .do files
 ******************************************************************************************************************/
+include `othertables'
 include `vargen'
 include `countryspecific'
 include `formatting'
 use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
-export delimited using "`CCRX'_HHQFQ_SOITable_$today", replace
-
-
-
-
-
-
-
-
+export delimited using "$csv_results/`CCRX'_HHQFQ_SOITable_$today", replace
 
