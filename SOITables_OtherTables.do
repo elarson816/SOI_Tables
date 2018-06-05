@@ -109,7 +109,7 @@ gen measure="mcp" in 1
 	replace measure="cp" in 3
 	replace measure="dmpa" in 4
 	replace measure="dmpasc" in 5
-	replace measure="condom" in 6
+	replace measure="malecondom" in 6
 	replace measure="implant" in 7
 	replace measure="methodchosen" in 8
 	replace measure="fees_12months" in 9
@@ -130,10 +130,11 @@ restore
 
 use `temp'
 
-*Rename some variables	
-rename m4 dmpa
-capture rename m5 dmpasc
-rename m8 condom
+*Rename/Generate some variables	
+gen dmpa=0
+	replace dmpa=1 if current_method_recode==4
+gen dmpasc=0
+	replace dmpasc=1 if current_method_recode==5
 rename visited_by_health_worker visited_by_hw
 
 save `temp', replace
@@ -143,7 +144,7 @@ save `temp', replace
 foreach group in all mar {
 	
 	*Generate matrix for mean, standard error, upper and lower bounds of 95% CI
-	foreach measure in mcp tcp cp dmpa dmpasc condom implant visited_by_hw  {
+	foreach measure in mcp tcp cp dmpa dmpasc malecondom implant visited_by_hw  {
 		use `temp', clear
 
 		*svy Set
@@ -177,7 +178,6 @@ foreach group in all mar {
 	}
 
 ****Modern Users****
-
 *All women | Married women
 foreach group in all mar {
 	*Generate matrix for mean, standard error, upper and lower bounds of 95% CI
