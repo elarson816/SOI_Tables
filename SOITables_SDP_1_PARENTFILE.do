@@ -31,10 +31,10 @@ local dofiles "/Users/ealarson/Documents/RandomCoding/SOI_Tables"
 global csv_results "$datadir/csv_results"
 
 *Macros for .do files subsequent .do files
-local othertables "`dofiles'/SOITables_OtherTables.do"
-local vargen "`dofiles'/SOITables_VarGen.do"
-local countryspecific "`dofiles'/SOITables_CountrySpecific.do"
-local formatting "`dofiles'/SOITables_Formatting.do"
+local othertables "`dofiles'/SOITables_SDP_2_OtherTables.do"
+local vargen "`dofiles'/SOITables_SDP_3_VarGen.do"
+local countryspecific "`dofiles'/SOITables_SDP_4_CountrySpecific.do"
+local formatting "`dofiles'/SOITables_SDP_5_Formatting.do"
 
 *Date Macro
 local today=c(current_date)
@@ -211,6 +211,15 @@ local date "2015-06"
 local CCRX "GHR4"
 */
 
+*GHR5
+use "`analysisdata'/GHR5_SDP_AnalysisData.dta", clear
+*Set macros for country and round
+local country "Ghana"
+local round "Round 5"
+local date "2016-10"
+global CCRX "GHR5"
+*/
+
 /*IDR1
 use "`datadir'/Indonesia/Round1/IDR1_SDP_AnalysisData.dta", clear
 * If 1 and 3 month injectables and are presenting as one category, combine injectable variables here if doing so
@@ -255,7 +264,7 @@ local CCRX "INR1_Rajasthan"
 gen region=1
 */
 
-*INR2
+/*INR2
 use "`datadir'/Rajasthan/Round2/RJR2_SDP_AnalysisData.dta"
 rename fees_rw fees
 *Set macros for country and round

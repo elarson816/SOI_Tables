@@ -13,7 +13,7 @@ local country $country
 local round $round
 local today $today
 local date $date
-use "$datadir/`CCRX'_SOIPrep_countryspecific.dta", clear
+use "$datadir/`CCRX'_SOIPrep_HHQFQ_countryspecific.dta", clear
 
 *Generate one variable per dataset
 gen percent=1 if percent_of_total!=.
@@ -333,8 +333,8 @@ merge 1:1 Category using `temp_total_rb_all.dta', gen(merge_total_rb_all)
 merge 1:1 Category using `temp_total_rb_mar.dta', gen(merge_total_rb_mar)
 
 sort id
-save "$datadir/`CCRX'_SOITable_DataViz.dta", replace
-use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
+save "$datadir/`CCRX'_SOITable_HHQFQ_DataViz.dta", replace
+use "$datadir/`CCRX'_SOITable_HHQFQ_DataViz.dta", clear
 
 drop id merge*
 save, replace
@@ -360,8 +360,8 @@ foreach group in all mar {
 	}
 drop total_*
 
-save "$datadir/`CCRX'_SOITable_DataViz.dta", replace
-use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
+save "$datadir/`CCRX'_SOITable_HHQFQ_DataViz.dta", replace
+use "$datadir/`CCRX'_SOITable_HHQFQ_DataViz.dta", clear
 
 *5. Ordering
 foreach var in cp mcp tcp ///

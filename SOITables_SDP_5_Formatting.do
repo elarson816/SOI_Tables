@@ -13,17 +13,19 @@ local country $country
 local round $round
 local today $today
 local date $date
-use "$datadir/`CCRX'_SOIPrep_countryspecific.dta", clear
+use "`CCRX'_SOIPrep_SDP_countryspecific.dta", clear
 
 *Generate one variable per dataset
 gen feespub=1 if fees_public!=. 
-gen feespriv=1 if fees_private!=. 
+gen feespriv=1 if fees_priv!=. 
 gen threshold3pub=1 if threshold_3_public!=. | provided_pills_public!=.
-gen threshold3priv=1 if threshold_3_private!=. | provided_pills_private!=.
+gen threshold3priv=1 if threshold_3_priv!=. | provided_pills_priv!=.
 gen sterfemale=1 if visits_female_ster!=. 
 gen stermale=1 if visits_male_ster!=.
-gen injectablestotal=1 if visits_injectables_total!=. 
-gen injectablesnew=1 if visits_injectables_new!=.
+gen dmpatotal=1 if visits_dmpa_total!=. 
+gen dmpasctotal=1 if visits_dmpasc_total!=.
+gen dmpanew=1 if visits_dmpa_new!=.
+gen dmpascnew=1 if visits_dmpasc_new!=.
 gen iudtotal=1 if visits_iud_total!=. 
 gen iudnew=1 if visits_iud_new!=.
 gen implantstotal=1 if visits_implants_total!=. 
@@ -50,7 +52,7 @@ restore
 preserve
 keep if feespriv==1
 keep Country Round Date Grouping Category ///
-fees_private-stockout_3mo_now_ec_private 
+fees_priv-stockout_3mo_now_ec_priv 
 tempfile temp_feespriv
 save `temp_feespriv.dta', replace 
 restore 
@@ -68,7 +70,7 @@ restore
 preserve
 keep if threshold3priv==1
 keep Country Round Date Grouping Category ///
-threshold_3_private-provided_ec_private
+threshold_3_priv-provided_ec_priv
 tempfile temp_threshold3priv
 save `temp_threshold3priv.dta', replace 
 restore 
@@ -95,20 +97,38 @@ restore
 
 *3a_3. Public & Private: Visits
 preserve
-keep if injectablestotal==1
+keep if dmpatotal==1
 keep Category ///
-visits_injectables_total
-tempfile temp_injectablestotal
-save `temp_injectablestotal.dta', replace 
+visits_dmpa_total
+tempfile temp_dmpatotal
+save `temp_dmpatotal.dta', replace 
+restore 
+
+*3a_3. Public & Private: Visits
+preserve
+keep if dmpasctotal==1
+keep Category ///
+visits_dmpasc_total
+tempfile temp_dmpasctotal
+save `temp_dmpasctotal.dta', replace 
 restore 
 
 *3a_4. Public & Private: Visits
 preserve
-keep if injectablesnew==1
+keep if dmpanew==1
 keep Category ///
-visits_injectables_new
-tempfile temp_injectablesnew
-save `temp_injectablesnew.dta', replace 
+visits_dmpa_new
+tempfile temp_dmpanew
+save `temp_dmpanew.dta', replace 
+restore 
+
+*3a_4. Public & Private: Visits
+preserve
+keep if dmpascnew==1
+keep Category ///
+visits_dmpasc_new
+tempfile temp_dmpascnew
+save `temp_dmpascnew.dta', replace 
 restore 
 
 *3a_5. Public & Private: Visits
@@ -251,19 +271,19 @@ merge_facilitiesnumb merge_facilitiesperc
 
 foreach var in fees threshold_3 threshold_5 ///
 {
-order `var'_private, after(`var'_public)
+order `var'_priv, after(`var'_public)
 }
 foreach var in visits_injectables visits_iud visits_implants ///
 visits_male_condoms visits_pills visits_ec ///
 {
 order `var'_new, after(`var'_total)
 }
-order threshold_3_public-threshold_3_private, after(fees_private)
-order threshold_5_public-threshold_5_private, after(threshold_3_private)
-order provided_pills_public-provided_ec_public, after(threshold_5_private)
-order provided_pills_private-provided_ec_private, after(provided_ec_public)
-order stockout_3mo_now_pills_public-stockout_3mo_now_ec_public, after(provided_ec_private)
-order stockout_3mo_now_pills_private-stockout_3mo_now_ec_private, after(stockout_3mo_now_ec_public)
+order threshold_3_public-threshold_3_priv, after(fees_priv)
+order threshold_5_public-threshold_5_priv, after(threshold_3_priv)
+order provided_pills_public-provided_ec_public, after(threshold_5_priv)
+order provided_pills_priv-provided_ec_priv, after(provided_ec_public)
+order stockout_3mo_now_pills_public-stockout_3mo_now_ec_public, after(provided_ec_priv)
+order stockout_3mo_now_pills_priv-stockout_3mo_now_ec_priv, after(stockout_3mo_now_ec_public)
 order visits_male_ster, after(visits_female_ster)
 order visits_injectables_total, after(visits_male_ster)
 order one_number, after(visits_ec_new)

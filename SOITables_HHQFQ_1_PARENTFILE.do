@@ -29,10 +29,10 @@ global csv_results "$datadir/csv_results"
 cd "$datadir"
 
 *Macros for .do files subsequent .do files
-local othertables "`dofiles'/SOITables_OtherTables.do"
-local vargen "`dofiles'/SOITables_VarGen.do"
-local countryspecific "`dofiles'/SOITables_CountrySpecific.do"
-local formatting "`dofiles'/SOITables_Formatting.do"
+local othertables "`dofiles'/SOITables_HHQFQ_2_OtherTables.do"
+local vargen "`dofiles'/SOITables_HHQFQ_3_VarGen.do"
+local countryspecific "`dofiles'/SOITables_HHQFQ_4_CountrySpecific.do"
+local formatting "`dofiles'/SOITables_HHQFQ_5_Formatting.do"
 
 *Date Macro
 local today=c(current_date)

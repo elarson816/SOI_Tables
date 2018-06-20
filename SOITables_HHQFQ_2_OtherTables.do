@@ -52,7 +52,7 @@ foreach v in HHQ_selected HHQ_occupied HHQ_completed {
 	
 gen HHQ_response=(HHQ_completed/HHQ_occupied)
 
-save "`CCRX'_SOITable_ResponseRates.dta", replace
+save "`CCRX'_SOITable_HHQFQ_ResponseRates.dta", replace
 restore
 
 * Female Response Rates
@@ -90,7 +90,7 @@ restore
 
 *Combine and generate dataset
 preserve
-use "`CCRX'_SOITable_ResponseRates.dta", clear
+use "`CCRX'_SOITable_HHQFQ_ResponseRates.dta", clear
 merge 1:1 ur using `FQ_response'
 drop _merge
 save, replace
@@ -125,7 +125,7 @@ foreach group in all mar {
 	gen ci_upperbound_`group'=.
 	}
 	
-	save "`CCRX'_SOITable_SampleError_$today.dta", replace
+	save "`CCRX'_SOITable_HHQFQ_SampleError_$today.dta", replace
 restore
 
 use `temp'
@@ -165,7 +165,7 @@ foreach group in all mar {
 		matrix `measure'_lb_`group'= _b[`measure']-invttail(e(df_r),0.025)*_se[`measure']
 		matrix `measure'_ub_`group'= _b[`measure']+invttail(e(df_r),0.025)*_se[`measure']
 		
-		use "`CCRX'_SOITable_SampleError_$today.dta", clear
+		use "`CCRX'_SOITable_HHQFQ_SampleError_$today.dta", clear
 		
 		replace mean_`group'=`measure'_mean_`group'[1,1] if measure=="`measure'"
 		replace standard_error_`group'=`measure'_se_`group'[1,1] if measure=="`measure'"
@@ -203,7 +203,7 @@ foreach group in all mar {
 		matrix `measure'_lb_`group'= _b[`measure']-invttail(e(df_r),0.025)*_se[`measure']
 		matrix `measure'_ub_`group'= _b[`measure']+invttail(e(df_r),0.025)*_se[`measure']
 
-		use "`CCRX'_SOITable_SampleError_$today.dta", clear
+		use "`CCRX'_SOITable_HHQFQ_SampleError_$today.dta", clear
 				
 		replace mean_`group'=`measure'_mean_`group'[1,1] if measure=="`measure'"
 		replace standard_error_`group'=`measure'_se_`group'[1,1] if measure=="`measure'"
@@ -243,7 +243,7 @@ foreach group in all mar {
 		matrix `measure'_lb_`group'= _b[`measure']-invttail(e(df_r),0.025)*_se[`measure']
 		matrix `measure'_ub_`group'= _b[`measure']+invttail(e(df_r),0.025)*_se[`measure']
 		
-		use "`CCRX'_SOITable_SampleError_$today.dta", clear
+		use "`CCRX'_SOITable_HHQFQ_SampleError_$today.dta", clear
 
 		replace mean_`group'=`measure'_mean_`group'[1,1] if measure=="`measure'"
 		replace standard_error_`group'=`measure'_se_`group'[1,1] if measure=="`measure'"
@@ -255,7 +255,7 @@ foreach group in all mar {
 		}
 	}
 
-use "`CCRX'_SOITable_SampleError_$today.dta", clear
+use "`CCRX'_SOITable_HHQFQ_SampleError_$today.dta", clear
 export delimited using "$csv_results/`CCRX'_HHQFQ_SOITable_SampleError_$today", replace
 
 use "`analysisdata'/GHR5_HHQFQ_AnalysisData.dta", clear
