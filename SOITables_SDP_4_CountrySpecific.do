@@ -34,8 +34,8 @@ foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered 
 	}
 
 *Finish cleaning Category & Grouping
-foreach var in all facility_type_soi ur beds_cat sector12 {
-	forval y=1/96 {
+foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
+	forval y=0/96 {
 		replace `var'="`y'" if Category=="`var'_`y'"
 		}
 	}

@@ -25,7 +25,7 @@ set more off
 numlabel, add
 
 *Directory
-local analysisdata "/Users/ealarson/Dropbox (Gates Institute)/9 Data Management - Non-Francophone/Ghana/PMAGH_Datasets/Round5/Analysis"
+local analysisdata "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/SDP"
 global datadir "/Users/ealarson/Documents/Ghana/Data_NotShared/Round5/SOI/SDP"
 local dofiles "/Users/ealarson/Documents/RandomCoding/SOI_Tables"
 global csv_results "$datadir/csv_results"
@@ -214,9 +214,9 @@ local CCRX "GHR4"
 *GHR5
 use "`analysisdata'/GHR5_SDP_AnalysisData.dta", clear
 *Set macros for country and round
-local country "Ghana"
-local round "Round 5"
-local date "2016-10"
+global country "Ghana"
+global round "Round 5"
+global date "2016-10"
 global CCRX "GHR5"
 */
 
@@ -439,7 +439,7 @@ include `othertables'
 include `vargen'
 include `countryspecific'
 include `formatting'
-use "$datadir/`CCRX'_SOITable_DataViz.dta", clear
+use "$datadir/`CCRX'_SDP_SOITable_$today.dta", clear
 export delimited using "$csv_results/`CCRX'_SDP_SOITable_$today", replace
 
 

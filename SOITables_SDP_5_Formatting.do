@@ -16,11 +16,16 @@ local date $date
 use "`CCRX'_SOIPrep_SDP_countryspecific.dta", clear
 
 *Generate one variable per dataset
-gen feespub=1 if fees_public!=. 
+gen feespub=1 if fees_public!=.
+	gen d_feespub=1 if d_fees_public!=.
 gen feespriv=1 if fees_priv!=. 
+	gen d_feespriv=1 if d_fees_priv!=.
 gen threshold3pub=1 if threshold_3_public!=. | provided_pills_public!=.
+	gen d_threshold3pub=1 if d_threshold_3_public!=. | d_provided_pills_public!=.
 gen threshold3priv=1 if threshold_3_priv!=. | provided_pills_priv!=.
+	gen d_threshold3priv=1 if d_threshold_3_priv!=. | d_provided_pills_priv!=.
 gen sterfemale=1 if visits_female_ster!=. 
+
 gen stermale=1 if visits_male_ster!=.
 gen dmpatotal=1 if visits_dmpa_total!=. 
 gen dmpasctotal=1 if visits_dmpasc_total!=.
@@ -48,6 +53,15 @@ tempfile temp_feespub
 save `temp_feespub.dta', replace 
 restore 
 
+*1a. Public: Fees & Stock (Denominator)
+preserve
+keep if d_feespub==1
+keep Country Round Date Grouping Category ///
+d_fees_public-d_stockout_3mo_now_ec_public 
+tempfile temp_d_feespub
+save `temp_d_feespub.dta', replace 
+restore 
+
 *1b. Private: Fees & Stock Fees
 preserve
 keep if feespriv==1
@@ -55,6 +69,15 @@ keep Country Round Date Grouping Category ///
 fees_priv-stockout_3mo_now_ec_priv 
 tempfile temp_feespriv
 save `temp_feespriv.dta', replace 
+restore 
+
+*1b. Private: Fees & Stock Fees (Denominator)
+preserve
+keep if d_feespriv==1
+keep Country Round Date Grouping Category ///
+d_fees_priv-d_stockout_3mo_now_ec_priv 
+tempfile temp_d_feespriv
+save `temp_d_feespriv.dta', replace 
 restore 
 
 *2a. Public: 3+/5+ & Provision
@@ -66,6 +89,15 @@ tempfile temp_threshold3pub
 save `temp_threshold3pub.dta', replace 
 restore 
 
+*2a. Public: 3+/5+ & Provision (Denominator)
+preserve
+keep if d_threshold3pub==1
+keep Country Round Date Grouping Category ///
+d_threshold_3_public-d_provided_ec_public
+tempfile temp_d_threshold3pub
+save `temp_d_threshold3pub.dta', replace 
+restore 
+
 *2b. Private: Public: 3+/5+ & Provision
 preserve
 keep if threshold3priv==1
@@ -73,6 +105,15 @@ keep Country Round Date Grouping Category ///
 threshold_3_priv-provided_ec_priv
 tempfile temp_threshold3priv
 save `temp_threshold3priv.dta', replace 
+restore 
+
+*2b. Private: Public: 3+/5+ & Provision (Denominator)
+preserve
+keep if d_threshold3priv==1
+keep Country Round Date Grouping Category ///
+d_threshold_3_priv-d_provided_ec_priv
+tempfile temp_d_threshold3priv
+save `temp_d_threshold3priv.dta', replace 
 restore 
 
 *3a_1. Public & Private: Visits
@@ -241,39 +282,47 @@ save `temp_facilitiesperc.dta', replace
 restore
 
 use `temp_feespub.dta', clear
-merge 1:1 Category using `temp_feespriv.dta', gen(merge_feespriv)
-merge 1:1 Category using `temp_threshold3pub.dta', gen(merge_threshold3pub)
-merge 1:1 Category using `temp_threshold3priv.dta', gen(merge_threshold3priv)
-merge 1:m Category using `temp_sterfemale.dta', gen(merge_sterfemale)
-merge 1:1 Category using `temp_stermale.dta', gen(merge_stermale)
-merge 1:m Category using `temp_injectablestotal.dta', gen(merge_injectablestotal)
-merge 1:m Category using `temp_injectablesnew.dta', gen(merge_injectablesnew)
-merge 1:m Category using `temp_iudtotal.dta', gen(merge_iudtotal)
-merge 1:m Category using `temp_iudnew.dta', gen(merge_iudnew)
-merge 1:m Category using `temp_implantstotal.dta', gen(merge_implantstotal)
-merge 1:m Category using `temp_implantsnew.dta', gen(merge_implantsnew)
-merge 1:m Category using `temp_malecondomstotal.dta', gen(merge_malecondomstotal)
-merge 1:m Category using `temp_malecondomsnew.dta', gen(merge_malecondomsnew)
-merge 1:m Category using `temp_pillstotal.dta', gen(merge_pillstotal)
-merge 1:m Category using `temp_pillsnew.dta', gen(merge_pillsnew)
-merge 1:m Category using `temp_ectotal.dta', gen(merge_ectotal)
-merge 1:m Category using `temp_ecnew.dta', gen(merge_ecnew)
-merge m:m Category using `temp_facilitiesnumb.dta', gen(merge_facilitiesnumb)
-merge 1:m Category using `temp_facilitiesperc.dta', gen(merge_facilitiesperc) // *note -- with: merge 1:m received this error: "variable Category does not uniquely identify observations in the master data"
+		merge 1:1 Category using `temp_d_feespub.dta', gen(merge_d_feespub)
+	merge 1:1 Category using `temp_feespriv.dta', gen(merge_feespriv)
+		merge 1:1 Category using `temp_d_feespriv.dta', gen(merge_d_feespriv)
+	merge 1:1 Category using `temp_threshold3pub.dta', gen(merge_threshold3pub)
+		merge 1:1 Category using `temp_d_threshold3pub.dta', gen(merge_d_threshold3pub)
+	merge 1:1 Category using `temp_threshold3priv.dta', gen(merge_threshold3priv)
+		merge 1:1 Category using `temp_d_threshold3priv.dta', gen(merge_d_threshold3priv)
+	
+	merge 1:m Category using `temp_sterfemale.dta', gen(merge_sterfemale)
+	merge 1:1 Category using `temp_stermale.dta', gen(merge_stermale)
+	merge 1:m Category using `temp_dmpatotal.dta', gen(merge_dmpatotal)
+	merge 1:m Category using `temp_dmpasctotal.dta', gen(merge_dmpasctotal)
+	merge 1:m Category using `temp_dmpanew.dta', gen(merge_dmpanew)
+	merge 1:m Category using `temp_dmpascnew.dta', gen(merge_dmpascnew)
+	merge 1:m Category using `temp_iudtotal.dta', gen(merge_iudtotal)
+	merge 1:m Category using `temp_iudnew.dta', gen(merge_iudnew)
+	merge 1:m Category using `temp_implantstotal.dta', gen(merge_implantstotal)
+	merge 1:m Category using `temp_implantsnew.dta', gen(merge_implantsnew)
+	merge 1:m Category using `temp_malecondomstotal.dta', gen(merge_malecondomstotal)
+	merge 1:m Category using `temp_malecondomsnew.dta', gen(merge_malecondomsnew)
+	merge 1:m Category using `temp_pillstotal.dta', gen(merge_pillstotal)
+	merge 1:m Category using `temp_pillsnew.dta', gen(merge_pillsnew)
+	merge 1:m Category using `temp_ectotal.dta', gen(merge_ectotal)
+	merge 1:m Category using `temp_ecnew.dta', gen(merge_ecnew)
+	merge m:m Category using `temp_facilitiesnumb.dta', gen(merge_facilitiesnumb)
+	merge m:m Category using `temp_facilitiesperc.dta', gen(merge_facilitiesperc) // *note -- with: merge 1:m received this error: "variable Category does not uniquely identify observations in the master data"
 
 sort id
 drop id merge_feespriv merge_threshold3pub merge_threshold3priv ///
 merge_sterfemale merge_stermale ///
-merge_injectablestotal merge_injectablesnew merge_iudtotal merge_iudnew ///
+merge_dmpatotal merge_dmpanew merge_dmpasctotal merge_dmpascnew merge_iudtotal merge_iudnew ///
 merge_implantstotal merge_implantsnew merge_malecondomstotal merge_malecondomsnew ///
 merge_pillstotal merge_pillsnew merge_ectotal merge_ecnew ///
-merge_facilitiesnumb merge_facilitiesperc
+merge_facilitiesnumb merge_facilitiesperc ///
+merge_d_feespub merge_d_feespriv merge_d_threshold3pub merge_d_threshold3priv
 
 foreach var in fees threshold_3 threshold_5 ///
 {
 order `var'_priv, after(`var'_public)
 }
-foreach var in visits_injectables visits_iud visits_implants ///
+foreach var in visits_dmpa visits_dmpasc visits_iud visits_implants ///
 visits_male_condoms visits_pills visits_ec ///
 {
 order `var'_new, after(`var'_total)
@@ -285,7 +334,8 @@ order provided_pills_priv-provided_ec_priv, after(provided_ec_public)
 order stockout_3mo_now_pills_public-stockout_3mo_now_ec_public, after(provided_ec_priv)
 order stockout_3mo_now_pills_priv-stockout_3mo_now_ec_priv, after(stockout_3mo_now_ec_public)
 order visits_male_ster, after(visits_female_ster)
-order visits_injectables_total, after(visits_male_ster)
+order visits_dmpa_total, after(visits_male_ster)
+order visits_dmpasc_total, after(visits_dmpa_total)
 order one_number, after(visits_ec_new)
 order one_percentage, after(one_number)
 
@@ -335,5 +385,5 @@ sort n
 drop n
 }
 
-save "`CCRX'_SDP_DataViz.dta", replace
+save "`CCRX'_SDP_SOITable_$today.dta", replace
 exit

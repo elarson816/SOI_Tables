@@ -53,7 +53,9 @@ save `temp', replace
 ****************************************************************************************************************** 
 use `temp', replace
 
-foreach var in all facility_type_soi beds sector12 region fp_offered {
+rename region region_soi
+
+foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
 	preserve
 	
 	collapse (count) one, by(`var')
@@ -74,10 +76,10 @@ foreach var in all facility_type_soi beds sector12 region fp_offered {
 	
 *Combine into one variable
 preserve
-	use "`CCRX'_SOIPrep_SDP_vargen.dta"
+	use "`CCRX'_SOIPrep_SDP_vargen.dta", clear
 		gen percent_of_total=.
 		gen SDP_count=.
-	foreach var in all facility_type_soi beds sector12 region fp_offered {
+	foreach var in all facility_type_soi beds sector12 region_soi fp_offered {
 		replace percent_of_total=percent_`var' if percent_`var'!=.
 		replace SDP_count=count_`var' if count_`var'!=.
 		}
@@ -93,7 +95,9 @@ restore
 
 use `temp', replace
 
-foreach var in all facility_type_soi ur beds_cat {
+rename region region_soi
+
+foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
 	preserve
 
 	keep if fp_offered==1
@@ -155,7 +159,9 @@ foreach var in all facility_type_soi ur beds_cat {
 
 use `temp', replace
 
-foreach var in all facility_type_soi ur beds_cat {
+rename region region_soi
+
+foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
 	preserve
 
 	keep if fp_offered==1
@@ -190,7 +196,7 @@ foreach var in all facility_type_soi ur beds_cat {
 	*Generate Denominators
 	preserve
 	
-	collapse (count) fees_priv=fees_rw ///
+	collapse (count) d_fees_priv=fees_rw ///
 					 d_stockout_3mo_now_pills_priv=stockout_3mo_now_pills ///
 					 d_stockout_3mo_now_dmpa_priv=stockout_3mo_now_dmpa ///
 					 d_stockout_3mo_now_dmpasc_priv=stockout_3mo_now_dmpasc ///
@@ -216,8 +222,10 @@ foreach var in all facility_type_soi ur beds_cat {
 ****************************************************************************************************************** 
 
 use `temp', replace
+
+rename region region_soi
 	
-foreach var in all facility_type_soi ur beds_cat {
+foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
 	preserve
 
 	keep if sector12==1
@@ -294,7 +302,9 @@ use `temp', replace
 
 use `temp', replace
 
-foreach var in all facility_type_soi ur beds_cat {
+rename region region_soi
+
+foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
 	preserve
 
 	keep if sector12==2
@@ -367,6 +377,8 @@ foreach var in all facility_type_soi ur beds_cat {
 
 use `temp', replace
 
+rename region region_soi
+
 foreach method in female_ster male_ster ///
 	dmpa_total dmpa_new  ///
 	dmpasc_total dmpasc_new ///
@@ -376,7 +388,7 @@ foreach method in female_ster male_ster ///
 	pills_total pills_new  ///
 	ec_total ec_new {
  
-	foreach var in all facility_type_soi ur beds_cat sector12 {
+	foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
 
 		levelsof `var', local(levels)
 		foreach l of local levels {
