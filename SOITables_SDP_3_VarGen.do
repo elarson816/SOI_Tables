@@ -97,7 +97,7 @@ use `temp', replace
 
 rename region region_soi
 
-foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
+foreach var in all facility_type_soi beds_cat {
 	preserve
 
 	keep if fp_offered==1
@@ -132,6 +132,9 @@ foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered 
 	*Generate Denominators
 	preserve
 	
+	keep if fp_offered==1
+	keep if sector12==1
+	
 	collapse (count) d_fees_public=fees_rw ///
 					 d_stockout_3mo_now_pills_public=stockout_3mo_now_pills ///
 					 d_stockout_3mo_now_dmpa_public=stockout_3mo_now_dmpa ///
@@ -161,7 +164,7 @@ use `temp', replace
 
 rename region region_soi
 
-foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
+foreach var in all facility_type_soi beds_cat {
 	preserve
 
 	keep if fp_offered==1
@@ -195,6 +198,9 @@ foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered 
 	
 	*Generate Denominators
 	preserve
+
+	keep if fp_offered==1
+	keep if sector12==2	
 	
 	collapse (count) d_fees_priv=fees_rw ///
 					 d_stockout_3mo_now_pills_priv=stockout_3mo_now_pills ///
@@ -225,7 +231,7 @@ use `temp', replace
 
 rename region region_soi
 	
-foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
+foreach var in all facility_type_soi beds_cat {
 	preserve
 
 	keep if sector12==1
@@ -272,7 +278,9 @@ foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered 
 	*Generate Denominators
 	preserve
 	
-	collapse (count) d_threshold_3_public=threshold_3 threshold_5_public=threshold_5 ///
+	keep if sector12==1	
+	
+	collapse (count) d_threshold_3_public=threshold_3 d_threshold_5_public=threshold_5 ///
 					 d_provided_pills_public=provided_pills ///
 					 d_provided_dmpa_public=provided_dmpa ///
 					 d_provided_dmpasc_public=provided_dmpasc ///
@@ -304,7 +312,7 @@ use `temp', replace
 
 rename region region_soi
 
-foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
+foreach var in all facility_type_soi beds_cat {
 	preserve
 
 	keep if sector12==2
@@ -350,7 +358,10 @@ foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered 
 	
 	*Generate Denominators
 	preserve
-	collapse (count) d_threshold_3_private=threshold_3 threshold_5_private=threshold_5 ///
+	
+	keep if sector12==2	
+	
+	collapse (count) d_threshold_3_private=threshold_3 d_threshold_5_private=threshold_5 ///
 					 d_provided_pills_private=provided_pills ///
 					 d_provided_dmpa_private=provided_dmpa ///
 					 d_provided_dmpasc_private=provided_dmpasc ///
@@ -388,7 +399,7 @@ foreach method in female_ster male_ster ///
 	pills_total pills_new  ///
 	ec_total ec_new {
  
-	foreach var in all facility_type_soi ur beds_cat sector12 region_soi fp_offered {
+	foreach var in all facility_type_soi beds_cat sector12 {
 
 		levelsof `var', local(levels)
 		foreach l of local levels {

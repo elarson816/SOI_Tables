@@ -1,7 +1,7 @@
 /******************************************************************************************************************
 SOI TABLES ORDERING AND FORMATING
 
-Format Data into wide version and order variables
+Format Data into wide version
 ******************************************************************************************************************/
 
 clear
@@ -318,26 +318,115 @@ merge_pillstotal merge_pillsnew merge_ectotal merge_ecnew ///
 merge_facilitiesnumb merge_facilitiesperc ///
 merge_d_feespub merge_d_feespriv merge_d_threshold3pub merge_d_threshold3priv
 
-foreach var in fees threshold_3 threshold_5 ///
-{
-order `var'_priv, after(`var'_public)
-}
-foreach var in visits_dmpa visits_dmpasc visits_iud visits_implants ///
-visits_male_condoms visits_pills visits_ec ///
-{
-order `var'_new, after(`var'_total)
-}
-order threshold_3_public-threshold_3_priv, after(fees_priv)
-order threshold_5_public-threshold_5_priv, after(threshold_3_priv)
-order provided_pills_public-provided_ec_public, after(threshold_5_priv)
-order provided_pills_priv-provided_ec_priv, after(provided_ec_public)
-order stockout_3mo_now_pills_public-stockout_3mo_now_ec_public, after(provided_ec_priv)
-order stockout_3mo_now_pills_priv-stockout_3mo_now_ec_priv, after(stockout_3mo_now_ec_public)
+/******************************************************************************************************************
+SOI TABLES ORDERING AND FORMATING
+
+Order variables
+******************************************************************************************************************/
+
+*Table 1: Characteristics of service delivery points
+order one_number, after(Category)
+order one_percentage, after(one_number)
+
+*Table 2: Charging fees for family planning
+order fees_public, after(one_percentage)
+order d_fees_public, after(fees_public)
+order fees_priv, after(d_fees_public)
+order d_fees_priv, after(fees_priv)
+
+*Table 3: Contraceptive Choice: Availability of at least 3 or at least 5 modern contraceptive methods
+order threshold_3_public, after(d_fees_priv)
+order d_threshold_3_public, after(threshold_3_public)
+order threshold_3_priv, after(d_threshold_3_public)
+order d_threshold_3_priv, after(threshold_3_priv)
+order threshold_5_public, after(d_threshold_3_priv)
+order d_threshold_5_public, after(threshold_5_public)
+order threshold_5_priv, after(d_threshold_5_public)
+order d_threshold_5_priv, after(threshold_5_priv)
+
+*Table 4: Contraceptive Choice: Availability of modern contraception, by method
+order provided_pills_public, after(d_threshold_5_priv)
+order d_provided_pills_public, after(provided_pills_public)
+order provided_dmpa_public, after(d_provided_pills_public)
+order d_provided_dmpa_public, after(provided_dmpa_public)
+order provided_dmpasc_public, after(d_provided_dmpa_public)
+order d_provided_dmpasc_public, after(provided_dmpasc_public)
+order provided_iud_public, after(d_provided_dmpasc_public)
+order d_provided_iud_public, after(provided_iud_public)
+order provided_implants_public, after(d_provided_iud_public)
+order d_provided_implants_public, after(provided_implants_public)
+order provided_male_condoms_public, after(d_provided_implants_public)
+order d_provided_male_condoms_public, after(provided_male_condoms_public)
+order provided_female_ster_public, after(d_provided_male_condoms_public)
+order d_provided_female_ster_public, after(provided_female_ster_public)
+order provided_ec_public, after(d_provided_female_ster_public)
+order d_provided_ec_public, after(provided_ec_public)
+
+order provided_pills_priv, after(d_provided_ec_public)
+order d_provided_pills_priv, after(provided_pills_priv)
+order provided_dmpa_priv, after(d_provided_pills_priv)
+order d_provided_dmpa_priv, after(provided_dmpa_priv)
+order provided_dmpasc_priv, after(d_provided_dmpa_priv)
+order d_provided_dmpasc_priv, after(provided_dmpasc_priv)
+order provided_iud_priv, after(d_provided_dmpasc_priv)
+order d_provided_iud_priv, after(provided_iud_priv)
+order provided_implants_priv, after(d_provided_iud_priv)
+order d_provided_implants_priv, after(provided_implants_priv)
+order provided_male_condoms_priv, after(d_provided_implants_priv)
+order d_provided_male_condoms_priv, after(provided_male_condoms_priv)
+order provided_female_ster_priv, after(d_provided_male_condoms_priv)
+order d_provided_female_ster_priv, after(provided_female_ster_priv)
+order provided_ec_priv, after(d_provided_female_ster_priv)
+order d_provided_ec_priv, after(provided_ec_priv)
+
+*Table 5: Contraceptive stock-outs, by method
+order stockout_3mo_now_pills_public, after(d_provided_ec_priv)
+order d_stockout_3mo_now_pills_public, after(stockout_3mo_now_pills_public)
+order stockout_3mo_now_dmpa_public, after(d_stockout_3mo_now_pills_public)
+order d_stockout_3mo_now_dmpa_public, after(stockout_3mo_now_dmpa_public)
+order stockout_3mo_now_dmpasc_public, after(d_stockout_3mo_now_dmpa_public)
+order d_stockout_3mo_now_dmpasc_public, after(stockout_3mo_now_dmpasc_public)
+order stockout_3mo_now_iud_public, after(d_stockout_3mo_now_dmpasc_public)
+order d_stockout_3mo_now_iud_public, after(stockout_3mo_now_iud_public)
+order stockout_3mo_now_impla_public, after(d_stockout_3mo_now_iud_public)
+order d_stockout_3mo_now_impla_public, after(stockout_3mo_now_impla_public)
+order stockout_3mo_now_maleco_public, after(d_stockout_3mo_now_impla_public)
+order d_stockout_3mo_now_maleco_public, after(stockout_3mo_now_maleco_public)
+order stockout_3mo_now_ec_public, after(d_stockout_3mo_now_maleco_public)
+order d_stockout_3mo_now_ec_public, after(stockout_3mo_now_ec_public)
+
+order stockout_3mo_now_pills_priv, after(d_stockout_3mo_now_ec_public)
+order d_stockout_3mo_now_pills_priv, after(stockout_3mo_now_pills_priv)
+order stockout_3mo_now_dmpa_priv, after(d_stockout_3mo_now_pills_priv)
+order d_stockout_3mo_now_dmpa_priv, after(stockout_3mo_now_dmpa_priv)
+order stockout_3mo_now_dmpasc_priv, after(d_stockout_3mo_now_dmpa_priv)
+order d_stockout_3mo_now_dmpasc_priv, after(stockout_3mo_now_dmpasc_priv)
+order stockout_3mo_now_iud_priv, after(d_stockout_3mo_now_dmpasc_priv)
+order d_stockout_3mo_now_iud_priv, after(stockout_3mo_now_iud_priv)
+order stockout_3mo_now_impla_priv, after(d_stockout_3mo_now_iud_priv)
+order d_stockout_3mo_now_impla_priv, after(stockout_3mo_now_impla_priv)
+order stockout_3mo_now_maleco_priv, after(d_stockout_3mo_now_impla_priv)
+order d_stockout_3mo_now_maleco_priv, after(stockout_3mo_now_maleco_priv)
+order stockout_3mo_now_ec_priv, after(d_stockout_3mo_now_maleco_priv)
+order d_stockout_3mo_now_ec_priv, after(stockout_3mo_now_ec_priv)
+
+*Table 6: Number of family planning visits, by method
+order visits_female_ster, after(d_stockout_3mo_now_ec_priv)
 order visits_male_ster, after(visits_female_ster)
 order visits_dmpa_total, after(visits_male_ster)
-order visits_dmpasc_total, after(visits_dmpa_total)
-order one_number, after(visits_ec_new)
-order one_percentage, after(one_number)
+order visits_dmpa_new, after(visits_dmpa_total)
+order visits_dmpasc_total, after(visits_dmpa_new)
+order visits_dmpasc_new, after(visits_dmpasc_total)
+order visits_iud_total, after(visits_dmpasc_new)
+order visits_iud_new, after(visits_iud_total)
+order visits_implants_total, after(visits_iud_new)
+order visits_implants_new, after(visits_implants_total)
+order visits_male_condoms_total, after(visits_implants_new)
+order visits_male_condoms_new, after(visits_male_condoms_total)
+order visits_pills_total, after(visits_male_condoms_new)
+order visits_pills_new, after(visits_pills_total)
+order visits_ec_total, after(visits_pills_new)
+order visits_ec_new, after(visits_ec_total)
 
 *Niger Round 1: no SDPs for some categories
 if Country=="Niger_Niamey" & Round=="Round 1" {
@@ -386,4 +475,4 @@ drop n
 }
 
 save "`CCRX'_SDP_SOITable_$today.dta", replace
-exit
+
