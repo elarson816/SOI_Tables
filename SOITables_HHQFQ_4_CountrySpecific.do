@@ -11,9 +11,10 @@ cd "$datadir"
 local CCRX $CCRX
 local country $country
 local round $round
+local today $today
 local date $date
 
-use "`CCRX'_SOIPrep_vargen.dta"
+use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 
 *Create columns for Country, Round, Date
 replace Country="`country'"
@@ -219,7 +220,7 @@ foreach x in age5 married umsexactive parity3 ur school wealth region {
 	drop `x'
 	}
 
-save "$datadir/`CCRX'_SOIPrep_countryspecific.dta", replace
+save "$datadir/`CCRX'_SOIPrep_HHQFQ_countryspecific.dta", replace
 	
 *Keep only one total_* observation per variable
 unab varlist: total_*
@@ -230,7 +231,7 @@ foreach v in `varlist' {
 	tempfile temp3
 	save `temp3'
 	
-	use "$datadir/`CCRX'_SOIPrep_countryspecific.dta"
+	use "$datadir/`CCRX'_SOIPrep_HHQFQ_countryspecific.dta"
 	append using `temp3'
 	replace Country="Ghana" if one_`v'!=.
 	replace Round="Round 5" if one_`v'!=.
@@ -239,10 +240,10 @@ foreach v in `varlist' {
 	replace Category="All" if one_`v'!=.
 	drop `v'
 	rename one_`v' `v'
-	save "$datadir/`CCRX'_SOIPrep_countryspecific.dta", replace
+	save "$datadir/`CCRX'_SOIPrep_HHQFQ_countryspecific.dta", replace
 	
 	restore
 	}
-use "$datadir/`CCRX'_SOIPrep_countryspecific.dta", clear
+use "$datadir/`CCRX'_SOIPrep_HHQFQ_countryspecific.dta", clear
 
-save "$datadir/`CCRX'_SOIPrep_countryspecific.dta", replace
+save "$datadir/`CCRX'_SOIPrep_HHQFQ_countryspecific.dta", replace

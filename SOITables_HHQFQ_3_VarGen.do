@@ -14,6 +14,7 @@ use `temp', replace
 local CCRX $CCRX
 local country $country
 local round $round
+local today $today
 local date $date
 
 *Recode return/ refer
@@ -27,7 +28,7 @@ save `temp', replace
 *Create blank dataset
 clear
 gen Country="`country'"
-save "`CCRX'_SOIPrep_vargen.dta", replace
+save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 
 *Go back to temp dataset
 use `temp', replace
@@ -72,9 +73,9 @@ foreach var in total age5 married umsexactive parity3 ur school wealth region {
 	tempfile temp2
 	save `temp2', replace
 
-	use "`CCRX'_SOIPrep_vargen.dta"
+	use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 	append using `temp2'
-	save "`CCRX'_SOIPrep_vargen.dta", replace
+	save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 	restore
 	
 	preserve
@@ -86,15 +87,15 @@ foreach var in total age5 married umsexactive parity3 ur school wealth region {
 	tempfile temp2
 	save `temp2', replace
 
-	use "`CCRX'_SOIPrep_vargen.dta"
+	use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 	append using `temp2'
-	save "`CCRX'_SOIPrep_vargen.dta", replace
+	save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 	restore
 	}
 	
 *Combine into one variable
 preserve
-	use "`CCRX'_SOIPrep_vargen.dta"
+	use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		gen percent_of_total=.
 		gen weighted_count=.
 		gen unweighted_count=.
@@ -106,7 +107,7 @@ preserve
 	capture drop if married==0
 	capture drop if umsexactive==0
 	capture drop if married==1 & cp_mar!=.	
-	save "`CCRX'_SOIPrep_vargen.dta", replace
+	save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 restore	
 		
 ****************************************************************************************************************** 
@@ -149,9 +150,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 	
 	*Generate Denominators 
@@ -179,14 +180,14 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
 		foreach indicator in cp mcp tcp ///
 			unmettot unmetspace unmetlimit totaldemand demandsatis ///
 			visited_by_health_worker visited_facility_fp_disc fp_discussion {
 			capture order d_`indicator'_`group', after(`indicator'_`group')
 
-			save "`CCRX'_SOIPrep_vargen.dta", replace
+			save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 			}
 		restore
 	
@@ -199,9 +200,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 		
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore	
 		}
 	}
@@ -258,9 +259,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 	
 		*Generate Denominators
@@ -288,11 +289,11 @@ foreach group in all mar {
 		tempfile temp2	
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
 		foreach method in ster implant IUD dmpa dmpasc pill ec condom other_modern traditional {
 			capture order d_`method'_`group', after(`method'_`group')
-			save "`CCRX'_SOIPrep_vargen.dta", replace
+			save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 			}
 		restore
 		
@@ -305,9 +306,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 		
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 		}
 	}
@@ -373,9 +374,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 
 	
@@ -413,14 +414,14 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
 		foreach option in methodchoice_self methodchoice_joint methodchoice_other ///
 			fees_12months fp_told_other_methods fp_side_effects ///
 			return_to_provider refer_to_relative returnrefer_dir {
 			capture order d_`option'_`group', after(`option'_`group')
 			capture order d_fp_sideffects_instruct_`group', after(fp_side_effects_instructions_`group')
-			save "`CCRX'_SOIPrep_vargen.dta", replace
+			save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 			}
 		restore
 		
@@ -435,9 +436,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 		
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 		}
 	}
@@ -478,9 +479,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 	
 		*Generate Denominators
@@ -504,11 +505,11 @@ foreach group in all mar {
 		tempfile temp2	
 		save `temp2', replace
 
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
 		foreach intention in wanted_then wanted_later wanted_not {
 			capture order d_`intention'_`group', after(`intention'_`group')
-			save "`CCRX'_SOIPrep_vargen.dta", replace
+			save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 			}
 		restore
 				
@@ -524,9 +525,9 @@ foreach group in all mar {
 		tempfile temp2
 		save `temp2', replace
 		
-		use "`CCRX'_SOIPrep_vargen.dta"
+		use "`CCRX'_SOIPrep_HHQFQ_vargen.dta"
 		append using `temp2'
-		save "`CCRX'_SOIPrep_vargen.dta", replace
+		save "`CCRX'_SOIPrep_HHQFQ_vargen.dta", replace
 		restore
 		}
 	}
