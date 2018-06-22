@@ -31,7 +31,6 @@ local dofiles "/Users/ealarson/Documents/RandomCoding/SOI_Tables"
 global csv_results "$datadir/csv_results"
 
 *Macros for .do files subsequent .do files
-local othertables "`dofiles'/SOITables_SDP_2_OtherTables.do"
 local vargen "`dofiles'/SOITables_SDP_3_VarGen.do"
 local countryspecific "`dofiles'/SOITables_SDP_4_CountrySpecific.do"
 local formatting "`dofiles'/SOITables_SDP_5_Formatting.do"
@@ -435,7 +434,6 @@ capture rename visits_male_ster_total visits_male_ster
 /******************************************************************************************************************
 Run .do files
 ******************************************************************************************************************/
-include `othertables'
 include `vargen'
 include `countryspecific'
 include `formatting'

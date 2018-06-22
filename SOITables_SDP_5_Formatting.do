@@ -282,16 +282,16 @@ save `temp_facilitiesperc.dta', replace
 restore
 
 use `temp_feespub.dta', clear
-		merge 1:1 Category using `temp_d_feespub.dta', gen(merge_d_feespub)
-	merge 1:1 Category using `temp_feespriv.dta', gen(merge_feespriv)
-		merge 1:1 Category using `temp_d_feespriv.dta', gen(merge_d_feespriv)
-	merge 1:1 Category using `temp_threshold3pub.dta', gen(merge_threshold3pub)
-		merge 1:1 Category using `temp_d_threshold3pub.dta', gen(merge_d_threshold3pub)
-	merge 1:1 Category using `temp_threshold3priv.dta', gen(merge_threshold3priv)
-		merge 1:1 Category using `temp_d_threshold3priv.dta', gen(merge_d_threshold3priv)
+		merge 1:m Category using `temp_d_feespub.dta', gen(merge_d_feespub)
+	merge m:m Category using `temp_feespriv.dta', gen(merge_feespriv)
+		merge 1:m Category using `temp_d_feespriv.dta', gen(merge_d_feespriv)
+	merge 1:m Category using `temp_threshold3pub.dta', gen(merge_threshold3pub)
+		merge 1:m Category using `temp_d_threshold3pub.dta', gen(merge_d_threshold3pub)
+	merge 1:m Category using `temp_threshold3priv.dta', gen(merge_threshold3priv)
+		merge 1:m Category using `temp_d_threshold3priv.dta', gen(merge_d_threshold3priv)
 	
 	merge 1:m Category using `temp_sterfemale.dta', gen(merge_sterfemale)
-	merge 1:1 Category using `temp_stermale.dta', gen(merge_stermale)
+	merge 1:m Category using `temp_stermale.dta', gen(merge_stermale)
 	merge 1:m Category using `temp_dmpatotal.dta', gen(merge_dmpatotal)
 	merge 1:m Category using `temp_dmpasctotal.dta', gen(merge_dmpasctotal)
 	merge 1:m Category using `temp_dmpanew.dta', gen(merge_dmpanew)
@@ -317,6 +317,13 @@ merge_implantstotal merge_implantsnew merge_malecondomstotal merge_malecondomsne
 merge_pillstotal merge_pillsnew merge_ectotal merge_ecnew ///
 merge_facilitiesnumb merge_facilitiesperc ///
 merge_d_feespub merge_d_feespriv merge_d_threshold3pub merge_d_threshold3priv
+
+*Replace denominator with 0 if missing
+unab varlist: d_*
+foreach var in `varlist' {
+	replace `var'=0 if `var'==. & Category=="CHPS"
+	replace `var'=0 if `var'==. & Category=="Pharmacy/Chemist/Retail/Other"
+	}
 
 /******************************************************************************************************************
 SOI TABLES ORDERING AND FORMATING

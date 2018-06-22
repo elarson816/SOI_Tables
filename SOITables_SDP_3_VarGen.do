@@ -209,7 +209,7 @@ foreach var in all facility_type_soi beds_cat {
 					 d_stockout_3mo_now_iud_priv=stockout_3mo_now_iud ///
 					 d_stockout_3mo_now_impla_priv=stockout_3mo_now_implants ///
 					 d_stockout_3mo_now_maleco_priv=stockout_3mo_now_male_condoms ///
-					 d_stockout_3mo_now_ec_priv=stockout_3mo_now_ec, by(`var')
+					 d_stockout_3mo_now_ec_priv=stockout_3mo_now_ec, by(`var')				
 					
 	tempfile temp2
 	save `temp2', replace
@@ -288,7 +288,7 @@ foreach var in all facility_type_soi beds_cat {
 					 d_provided_implants_public=provided_implants ///
 					 d_provided_male_condoms_public=provided_male_condoms ///
 					 d_provided_female_ster_public=provided_female_ster ///
-					 d_provided_ec_public=provided_ec, by(`var')
+					 d_provided_ec_public=provided_ec, by(`var')				 
 					 
 	tempfile temp2
 	save `temp2', replace
@@ -347,7 +347,7 @@ foreach var in all facility_type_soi beds_cat {
 	replace provided_male_condoms_private=provided_male_condoms_private*100 
 	replace provided_female_ster_private=provided_female_ster_private*100 
 	replace provided_ec_private=provided_ec_private*100
-		
+	
 	tempfile temp2
 	save `temp2', replace
 
@@ -369,7 +369,7 @@ foreach var in all facility_type_soi beds_cat {
 					 d_provided_implants_private=provided_implants ///
 					 d_provided_male_condoms_private=provided_male_condoms ///
 					 d_provided_female_ster_private=provided_female_ster ///
-					 d_provided_ec_private=provided_ec, by(`var')	
+					 d_provided_ec_private=provided_ec, by(`var')						 
 					 
 	tempfile temp2
 	save `temp2', replace
