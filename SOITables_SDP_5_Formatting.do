@@ -481,5 +481,19 @@ sort n
 drop n
 }
 
+*Replace DMPASC Variables to missing if country does not measure DMPASC
+unab varlist: *dmpasc*
+foreach var in `varlist' {
+	replace `var'=. if (Grouping=="none" & visits_dmpasc_total==0 & visits_dmpasc_new==0)
+	replace `var'=. if (Grouping=="Facility Type" & visits_dmpasc_total==0 & visits_dmpasc_new==0)
+	replace `var'=. if (Grouping=="Number of beds" & visits_dmpasc_total==0 & visits_dmpasc_new==0)	
+	}
+replace visits_dmpasc_total=. if (Grouping=="Sector" & visits_dmpasc_total==0 & visits_dmpasc_new==0)
+	
+replace visits_dmpasc_new=. if (Grouping=="none" & visits_dmpasc_total==. & visits_dmpasc_new==0)
+replace visits_dmpasc_new=. if (Grouping=="Facility Type" & visits_dmpasc_total==. & visits_dmpasc_new==0)
+replace visits_dmpasc_new=. if (Grouping=="Number of beds" & visits_dmpasc_total==. & visits_dmpasc_new==0)	
+replace visits_dmpasc_new=. if (Grouping=="Sector" & visits_dmpasc_total==. & visits_dmpasc_new==0)	
+
 save "`CCRX'_SDP_SOITable_$today.dta", replace
 
